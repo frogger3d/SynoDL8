@@ -11,21 +11,25 @@ namespace SynoDL8
 {
     internal class DSQuerier
     {
-        const string infoquery = @"webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth,SYNO.DownloadStation.Task";
+        const string infoquery = @"/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth,SYNO.DownloadStation.Task";
         /// <summary>
         /// auth query. string format {0} = account, string format {1} is passwd
         /// </summary>
-        const string authquery = @"webapi/auth.cgi?api=SYNO.API.Auth&version=2&method=login&account={0}&passwd={1}&session=DownloadStation&format=cookie";
+        const string authquery = @"/webapi/auth.cgi?api=SYNO.API.Auth&version=2&method=login&account={0}&passwd={1}&session=DownloadStation&format=cookie";
 
-        // http://myds.com/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth,SYNO.DownloadStation.Task
-        // http://myds.com/webapi/auth.cgi?api=SYNO.API.Auth&version=2&method=login&account=admin&passwd=12345&session=DownloadStation&format=cookie
-        // http://myds.com/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=list
+        // webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth,SYNO.DownloadStation.Task
+        // webapi/auth.cgi?api=SYNO.API.Auth&version=2&method=login&account=admin&passwd=12345&session=DownloadStation&format=cookie
+        // webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=list
 
         private readonly string Host;
+        private readonly string User;
+        private readonly string Password;
 
-        public DSQuerier(string host)
+        public DSQuerier(string host, string user, string password)
         {
-            this.Host = host;
+            this.Host = host.TrimEnd('/');
+            this.User = user;
+            this.Password = password;
         }
 
         public Task<string> GetDSVersions()

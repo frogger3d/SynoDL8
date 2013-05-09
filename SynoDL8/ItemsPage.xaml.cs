@@ -1,4 +1,5 @@
 ﻿using SynoDL8.Data;
+using SynoDL8.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,7 +34,8 @@ namespace SynoDL8
         {
             this.InitializeComponent();
 
-            var task = new DSQuerier(host).GetDSVersions();
+            var settings = new SettingsFlyoutViewModel();
+            var task = new DSQuerier(settings.Hostname, settings.User, settings.Password).GetDSVersions();
             task.Wait();
             var result = task.Result;
             this.Content = new TextBlock()
