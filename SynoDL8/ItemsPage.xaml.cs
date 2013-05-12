@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
@@ -17,6 +18,8 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 // The Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234233
 
@@ -29,19 +32,16 @@ namespace SynoDL8
     public sealed partial class ItemsPage : SynoDL8.Common.LayoutAwarePage
     {
         const string host = @"http://diskstation:5000/";
-        
+
+        private readonly DSQuerier DSQuerier;
+
         public ItemsPage()
         {
             this.InitializeComponent();
 
             var settings = new SettingsFlyoutViewModel();
-            var task = new DSQuerier(settings.Hostname, settings.User, settings.Password).GetDSVersions();
-            task.Wait();
-            var result = task.Result;
-            this.Content = new TextBlock()
-            {
-                Text = result
-            };
+            this.DSQuerier = new DSQuerier(settings.Hostname, settings.User, settings.Password);
+
         }
 
         /// <summary>
@@ -72,6 +72,31 @@ namespace SynoDL8
             // by passing required information as a navigation parameter
             var groupId = ((SampleDataGroup)e.ClickedItem).UniqueId;
             this.Frame.Navigate(typeof(SplitPage), groupId);
+        }
+
+        private async void Auth(object sender, RoutedEventArgs e)
+        {
+            this.DSResults.Text = await this.DSQuerier.Authenticate();
+        }
+
+        private async void Logout(object sender, RoutedEventArgs e)
+        {
+            this.DSResults.Text = await this.DSQuerier.Logout();
+        }
+
+        private async void Versions(object sender, RoutedEventArgs e)
+        {
+            this.DSResults.Text = await this.DSQuerier.GetVersions();
+        }
+
+        private async void Info(object sender, RoutedEventArgs e)
+        {
+            this.DSResults.Text = await this.DSQuerier.GetInfo();
+        }
+
+        private async void List(object sender, RoutedEventArgs e)
+        {
+            this.DSResults.Text = await this.DSQuerier.List();
         }
     }
 }
