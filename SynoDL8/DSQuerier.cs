@@ -23,7 +23,7 @@ namespace SynoDL8
 
         const string LogoutQuery = @"/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session=DownloadStation";
 
-        const string ListQuery = @"/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=list";
+        const string ListQuery = @"/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=list&additional=transfer,detail";
 
         // webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth,SYNO.DownloadStation.Task
         // webapi/auth.cgi?api=SYNO.API.Auth&version=2&method=login&account=admin&passwd=12345&session=DownloadStation&format=cookie
@@ -61,9 +61,49 @@ namespace SynoDL8
             return MakeAsyncRequest(Host + string.Format(LogoutQuery));
         }
 
+        /*
+{
+  "data": {
+    "offeset": 0,
+    "tasks": [
+      {
+        "additional": {
+          "detail": {
+            "connected_leechers": 1,
+            "connected_seeders": 5,
+            "create_time": "1368478229",
+            "destination": "Video",
+            "priority": "auto",
+            "total_peers": 0,
+            "uri": "http://fenopy.eu/torrent/Iron-Man-3-2013-DVDRIP-x264-Xvid/MTAxNTY1ODk=/download.torrent"
+          },
+          "transfer": {
+            "size_downloaded": "366086778",
+            "size_uploaded": "14661613",
+            "speed_download": 717737,
+            "speed_upload": 49191
+          }
+        },
+        "id": "dbid_85",
+        "size": "732957306",
+        "status": "downloading",
+        "status_extra": null,
+        "title": "Iron.Man.3.2013.DVDRIP..x264.Xvid",
+        "type": "bt",
+        "username": "sax"
+      }
+    ],
+    "total": 1
+  },
+         */
         public Task<string> List()
         {
-            return MakeAsyncRequest(Host + ListQuery);
+            var requestTask  = MakeAsyncRequest(Host + ListQuery);
+
+            var o = JObject.Parse(requestTask.Result);
+            var firstTitle = o["data"]["tasks"][0]["title"];
+
+            return requestTask;
         }
 
         // Define other methods and classes here
@@ -78,7 +118,7 @@ namespace SynoDL8
                 asyncResult => request.EndGetResponse(asyncResult),
                 (object)null);
 
-            return task.ContinueWith(t => url + Environment.NewLine + ReadStreamFromResponse(t.Result));
+            return task.ContinueWith(t => ReadStreamFromResponse(t.Result));
         }
 
         private static string ReadStreamFromResponse(WebResponse response)

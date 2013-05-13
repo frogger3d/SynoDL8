@@ -52,7 +52,7 @@
             </VariableSizedWrapGrid>
             
             <ScrollViewer Grid.Column="2">
-                <TextBlock x:Name="DSResults" FontSize="16" TextWrapping="Wrap"/>
+                <TextBlock x:Name="DSResults" FontSize="16" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
             </ScrollViewer>
         </Grid>
 
