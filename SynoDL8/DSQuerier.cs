@@ -51,9 +51,22 @@ namespace SynoDL8
             return MakeAsyncRequest(Host + DLInfoQuery);
         }
 
-        public Task<string> Authenticate()
+        /*
+{
+  "data": {
+    "sid": "oaRmWLvQP8CG6"
+  },
+  "success": true
+}
+         */
+        public Task<bool> Authenticate()
         {
-            return MakeAsyncRequest(Host + string.Format(AuthQuery, this.User, this.Password));
+            return MakeAsyncRequest(Host + string.Format(AuthQuery, this.User, this.Password))
+                      .ContinueWith(t => 
+                          {
+                              var o = JObject.Parse(t.Result);
+                              return (bool)o["success"];
+                          });
         }
 
         public Task<string> Logout()
@@ -101,24 +114,19 @@ namespace SynoDL8
             var requestTask  = MakeAsyncRequest(Host + ListQuery);
 
             var o = JObject.Parse(requestTask.Result);
-            var firstTitle = o["data"]["tasks"][0]["title"];
+            //var firstTitle = o["data"]["tasks"][0]["title"];
 
             return requestTask;
         }
 
-        // Define other methods and classes here
-        private static Task<string> MakeAsyncRequest(string url)
+        private static async Task<string> MakeAsyncRequest(string url)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.CookieContainer = Cookies;
             request.ContinueTimeout = 10;
 
-            Task<WebResponse> task = Task.Factory.FromAsync(
-                request.BeginGetResponse,
-                asyncResult => request.EndGetResponse(asyncResult),
-                (object)null);
-
-            return task.ContinueWith(t => ReadStreamFromResponse(t.Result));
+            WebResponse response = await request.GetResponseAsync();
+            return ReadStreamFromResponse(response);
         }
 
         private static string ReadStreamFromResponse(WebResponse response)

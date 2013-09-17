@@ -20,6 +20,9 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Concurrency;
 
 // The Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234233
 
@@ -74,9 +77,24 @@ namespace SynoDL8
             this.Frame.Navigate(typeof(SplitPage), groupId);
         }
 
-        private async void Auth(object sender, RoutedEventArgs e)
+        private void Auth(object sender, RoutedEventArgs e)
         {
-            this.DSResults.Text = await this.DSQuerier.Authenticate();
+            this.DSResults.Text = "";
+            this.message.Text = "Authenticating";
+
+            Observable.StartAsync(this.DSQuerier.Authenticate)
+                      .ObserveOnDispatcher()
+                      .Subscribe(
+                      ev => 
+                          {
+                              this.message.Text = ev ? "Authenticated" : "Authentication failed";
+                          },
+                      ex =>
+                          {
+                              this.DSResults.Text = ex.ToString();
+                              this.message.Text = "Connection failed";
+                          },
+                      () => this.message.Text = "Authenticated");
         }
 
         private async void Logout(object sender, RoutedEventArgs e)
