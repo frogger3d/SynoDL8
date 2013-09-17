@@ -15,7 +15,7 @@ namespace SynoDL8.ViewModels
         public const string UserKey = "user";
         public const string PasswordKey = "password";
 
-        ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
 
         public SettingsFlyoutViewModel()
         {

@@ -105,8 +105,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DataModel\DownloadTask.cs" />
     <Compile Include="DataModel\SampleDataSource.cs" />
-    <Compile Include="DSQuerier.cs" />
+    <Compile Include="DataModel\DSQuerier.cs" />
     <Compile Include="ItemsPage.xaml.cs">
       <DependentUpon>ItemsPage.xaml</DependentUpon>
     </Compile>

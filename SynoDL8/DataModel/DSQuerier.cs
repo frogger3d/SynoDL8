@@ -1,17 +1,17 @@
-﻿using Newtonsoft.Json.Linq;
-using SynoDL8.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SynoDL8
+﻿namespace SynoDL8.DataModel
 {
-    internal class DSQuerier
+    using Newtonsoft.Json.Linq;
+    using SynoDL8.ViewModels;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Http;
+    using System.Text;
+    using System.Threading.Tasks;
+
+    public class DSQuerier
     {
         const string VersionQuery = @"/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth,SYNO.DownloadStation.Task,SYNO.DownloadStation.Info,SYNO.DownloadStation.Schedule,SYNO.DownloadStation.Statistic";
 
@@ -61,17 +61,22 @@ namespace SynoDL8
          */
         public Task<bool> Authenticate()
         {
-            return MakeAsyncRequest(Host + string.Format(AuthQuery, this.User, this.Password))
-                      .ContinueWith(t => 
-                          {
-                              var o = JObject.Parse(t.Result);
-                              return (bool)o["success"];
-                          });
+            return DSQuerier.MakeAsyncRequest(Host + string.Format(AuthQuery, this.User, this.Password))
+                            .ContinueWith(t => 
+                                {
+                                    var o = JObject.Parse(t.Result);
+                                    return (bool)o["success"];
+                                });
         }
 
-        public Task<string> Logout()
+        public Task<bool> Logout()
         {
-            return MakeAsyncRequest(Host + string.Format(LogoutQuery));
+            return DSQuerier.MakeAsyncRequest(Host + string.Format(LogoutQuery))
+                            .ContinueWith(t =>
+                                {
+                                    var o = JObject.Parse(t.Result);
+                                    return (bool)o["success"];
+                                });
         }
 
         /*
@@ -109,14 +114,10 @@ namespace SynoDL8
     "total": 1
   },
          */
-        public Task<string> List()
+        public Task<IEnumerable<DownloadTask>> List()
         {
-            var requestTask  = MakeAsyncRequest(Host + ListQuery);
-
-            var o = JObject.Parse(requestTask.Result);
-            //var firstTitle = o["data"]["tasks"][0]["title"];
-
-            return requestTask;
+            return MakeAsyncRequest(Host + ListQuery)
+                      .ContinueWith(t => DownloadTask.FromJason(t.Result));
         }
 
         private static async Task<string> MakeAsyncRequest(string url)

@@ -23,6 +23,7 @@ using Newtonsoft.Json.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
+using SynoDL8.DataModel;
 
 // The Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234233
 
@@ -85,21 +86,34 @@ namespace SynoDL8
             Observable.StartAsync(this.DSQuerier.Authenticate)
                       .ObserveOnDispatcher()
                       .Subscribe(
-                      ev => 
+                          ev => 
+                              {
+                                  this.message.Text = ev ? "Authenticated" : "Authentication failed";
+                              },
+                          ex =>
+                              {
+                                  this.DSResults.Text = ex.ToString();
+                                  this.message.Text = "Connection failed";
+                              });
+        }
+
+        private void Logout(object sender, RoutedEventArgs e)
+        {
+            this.DSResults.Text = "";
+            this.message.Text = "Logging out";
+
+            Observable.StartAsync(this.DSQuerier.Logout)
+                      .ObserveOnDispatcher()
+                      .Subscribe(
+                          ev =>
                           {
-                              this.message.Text = ev ? "Authenticated" : "Authentication failed";
+                              this.message.Text = ev ? "Logged out partial" : "Logging out failed";
                           },
-                      ex =>
+                          ex =>
                           {
                               this.DSResults.Text = ex.ToString();
                               this.message.Text = "Connection failed";
-                          },
-                      () => this.message.Text = "Authenticated");
-        }
-
-        private async void Logout(object sender, RoutedEventArgs e)
-        {
-            this.DSResults.Text = await this.DSQuerier.Logout();
+                          });
         }
 
         private async void Versions(object sender, RoutedEventArgs e)
@@ -112,9 +126,24 @@ namespace SynoDL8
             this.DSResults.Text = await this.DSQuerier.GetInfo();
         }
 
-        private async void List(object sender, RoutedEventArgs e)
+        private void List(object sender, RoutedEventArgs e)
         {
-            this.DSResults.Text = await this.DSQuerier.List();
+            this.DSResults.Text = "";
+            this.message.Text = "Getting download list";
+
+            Observable.StartAsync(this.DSQuerier.List)
+                      .ObserveOnDispatcher()
+                      .Subscribe(
+                          ev => 
+                              {
+                                  this.DSResults.Text = string.Join(Environment.NewLine, ev.Select(t => t.ToString()));
+                                  this.message.Text = "Download list retrieved";
+                              },
+                          ex =>
+                              {
+                                  this.DSResults.Text = ex.ToString();
+                                  this.message.Text = "Connection failed";
+                              });
         }
     }
 }
