@@ -80,7 +80,7 @@ namespace SynoDL8
 
         private void Auth(object sender, RoutedEventArgs e)
         {
-            this.DSResults.Text = "";
+            this.DSResults.Content = "..";
             this.message.Text = "Authenticating";
 
             Observable.StartAsync(this.DSQuerier.Authenticate)
@@ -92,14 +92,14 @@ namespace SynoDL8
                               },
                           ex =>
                               {
-                                  this.DSResults.Text = ex.ToString();
+                                  this.DSResults.Content = ex.ToString();
                                   this.message.Text = "Connection failed";
                               });
         }
 
         private void Logout(object sender, RoutedEventArgs e)
         {
-            this.DSResults.Text = "";
+            this.DSResults.Content = "..";
             this.message.Text = "Logging out";
 
             Observable.StartAsync(this.DSQuerier.Logout)
@@ -111,24 +111,24 @@ namespace SynoDL8
                           },
                           ex =>
                           {
-                              this.DSResults.Text = ex.ToString();
+                              this.DSResults.Content = ex.ToString();
                               this.message.Text = "Connection failed";
                           });
         }
 
         private async void Versions(object sender, RoutedEventArgs e)
         {
-            this.DSResults.Text = await this.DSQuerier.GetVersions();
+            this.DSResults.Content = await this.DSQuerier.GetVersions();
         }
 
         private async void Info(object sender, RoutedEventArgs e)
         {
-            this.DSResults.Text = await this.DSQuerier.GetInfo();
+            this.DSResults.Content = await this.DSQuerier.GetInfo();
         }
 
         private void List(object sender, RoutedEventArgs e)
         {
-            this.DSResults.Text = "";
+            this.DSResults.Content = "..";
             this.message.Text = "Getting download list";
 
             Observable.StartAsync(this.DSQuerier.List)
@@ -136,12 +136,12 @@ namespace SynoDL8
                       .Subscribe(
                           ev => 
                               {
-                                  this.DSResults.Text = string.Join(Environment.NewLine, ev.Select(t => t.ToString()));
+                                  this.DSResults.Content = ev.ToList();
                                   this.message.Text = "Download list retrieved";
                               },
                           ex =>
                               {
-                                  this.DSResults.Text = ex.ToString();
+                                  this.DSResults.Content = ex.ToString();
                                   this.message.Text = "Connection failed";
                               });
         }
