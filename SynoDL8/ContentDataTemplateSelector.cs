@@ -19,8 +19,6 @@ namespace SynoDL8
 
         protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
         {
-            Debug.WriteLine(item == null ? "null" : item.GetType().ToString());
-
             if (item is string)
             {
                 return this.StringTemplate;

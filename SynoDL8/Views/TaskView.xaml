@@ -9,7 +9,7 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
     
-    <Grid Margin="5" Background="LightGray">
+    <Grid Background="LightGray" Margin="5">
         <StackPanel Orientation="Horizontal">
             <TextBlock Text="{Binding Path=Title}" Foreground="Black" Padding="5"/>
         </StackPanel>
