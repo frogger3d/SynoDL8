@@ -1,14 +1,16 @@
-﻿using SynoDL8.DataModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-
+﻿
 namespace SynoDL8
 {
+    using SynoDL8.DataModel;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Windows.UI.Xaml;
+    using Windows.UI.Xaml.Controls;
+
     public class ContentDataTemplateSelector : DataTemplateSelector
     {
         public DataTemplate TaskListTemplate { get; set; }
@@ -17,7 +19,7 @@ namespace SynoDL8
 
         protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
         {
-            return this.TaskListTemplate;
+            Debug.WriteLine(item == null ? "null" : item.GetType().ToString());
 
             if (item is string)
             {
