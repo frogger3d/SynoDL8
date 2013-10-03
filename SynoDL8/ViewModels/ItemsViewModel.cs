@@ -17,6 +17,7 @@
 
         private string message;
         private object content;
+        private string url;
 
         public ItemsViewModel()
         {
@@ -28,6 +29,7 @@
             this.VersionsCommand = new RelayCommand(this.Versions);
             this.InfoCommand = new RelayCommand(this.Info);
             this.ListCommand = new RelayCommand(this.List);
+            this.CreateCommand = new RelayCommand(this.Create);
         }
 
         public ICommand AuthCommand { get; private set; }
@@ -35,6 +37,13 @@
         public ICommand VersionsCommand { get; private set; }
         public ICommand InfoCommand { get; private set; }
         public ICommand ListCommand { get; private set; }
+        public ICommand CreateCommand { get; private set; }
+
+        public string Url
+        {
+            get { return this.url; }
+            set { this.Set("Url", ref this.url, value); }
+        }
 
         public string Message
         {
@@ -51,7 +60,7 @@
         private void Auth()
         {
             this.Message = "Authenticating";
-            Observable.StartAsync(this.DSQuerier.Authenticate)
+            Observable.StartAsync(this.DSQuerier.Login)
                       .ObserveOnDispatcher()
                       .Subscribe(
                           ev =>
@@ -92,6 +101,33 @@
         private async void Info()
         {
             this.Content = await this.DSQuerier.GetInfo();
+        }
+
+        private async void Create()
+        {
+            this.Content = "..";
+            this.Message = "Starting download";
+
+            Observable.StartAsync(this.CreateDownload)
+                      .ObserveOnDispatcher()
+                      .Subscribe(
+                          ev =>
+                          {
+                              this.Content = ev;
+                              this.Message = "Download started";
+                          },
+                          ex =>
+                          {
+                              this.Content = ex.ToString();
+                              this.Message = "Start download failed";
+                          });
+        }
+
+        private async Task<string> CreateDownload()
+        {
+            Task<string> createTask = this.DSQuerier.Create(this.Url);
+            this.Url = "";
+            return await createTask;
         }
 
         private void List()

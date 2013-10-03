@@ -40,6 +40,10 @@
                 <Button Command="{Binding Path=VersionsCommand}">Versions</Button>
                 <Button Command="{Binding Path=InfoCommand}">Info</Button>
                 <Button Command="{Binding Path=ListCommand}">List</Button>
+                <TextBox Text="{Binding Path=Url}"
+                         local:UpdateSourceHelper.IsEnabled="True" 
+                         local:UpdateSourceHelper.UpdateSourceText="{Binding Url, Mode=TwoWay}"/>
+                <Button Command="{Binding Path=CreateCommand}">Create</Button>
             </VariableSizedWrapGrid>
             
             <ContentControl FontSize="16" Grid.Column="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
