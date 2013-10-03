@@ -6,6 +6,7 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using System.Windows.Input;
 
     public class DownloadTask
     {
@@ -29,12 +30,15 @@
             get { return (double)this.SizeDownloaded / this.Size; }
         }
 
+        public ICommand PlayCommand { get; set; }
+        public ICommand PauseCommand { get; set; }
+
         public override string ToString()
         {
             return this.Title + " " + this.Id + " " + this.Status + " " + string.Format("{0:0.00%}", this.Progress);
         }
 
-        public static IEnumerable<DownloadTask> FromJason(string jasonString)
+        public static IEnumerable<DownloadTask> FromJason(string jasonString, DSQuerier dsquerier)
         {
             var root = JObject.Parse(jasonString);
             if ((bool)root["success"])
@@ -43,9 +47,11 @@
                 {
                     var additional = task["additional"];
                     var transfer = additional["transfer"];
+
+                    string taskid = (string)task["id"];
                     yield return new DownloadTask()
                     {
-                        Id = (string)task["id"],
+                        Id = taskid,
                         Title = (string)task["title"],
                         Size = (long)task["size"],
                         Status = (string)task["status"],
@@ -53,6 +59,8 @@
                         SizeDownloaded = (long)transfer["size_downloaded"],
                         SpeedUpload = (long)transfer["speed_upload"],
                         SpeedDownload = (long)transfer["speed_download"],
+                        PlayCommand = new RelayCommand(() => dsquerier.Resume(taskid)),
+                        PauseCommand = new RelayCommand(() => dsquerier.Pause(taskid)),
                     };
                 }
             }

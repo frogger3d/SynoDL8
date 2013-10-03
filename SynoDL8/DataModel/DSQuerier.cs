@@ -29,6 +29,9 @@
         const string CreateUri = @"/webapi/DownloadStation/task.cgi";
         const string CreateRequest = "api=SYNO.DownloadStation.Task&version=1&method=create&uri={0}";
 
+        const string PauseQuery = @"/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=pause&id={0}";
+        const string ResumeQuery = @"/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=resume&id={0}";
+
         private readonly string Host;
         private readonly string User;
         private readonly string Password;
@@ -74,12 +77,22 @@
         public Task<IEnumerable<DownloadTask>> List()
         {
             return MakeAsyncRequest(Host + ListQuery)
-                      .ContinueWith(t => DownloadTask.FromJason(t.Result));
+                      .ContinueWith(t => DownloadTask.FromJason(t.Result, this));
         }
 
         public Task<string> Create(string url)
         {
             return MakeAsyncRequest(Host + CreateUri, method: "POST", req: string.Format(CreateRequest, url));
+        }
+
+        public Task<string> Resume(string taskid)
+        {
+            return MakeAsyncRequest(Host + string.Format(ResumeQuery, taskid));
+        }
+
+        public Task<string> Pause(string taskid)
+        {
+            return MakeAsyncRequest(Host + string.Format(PauseQuery, taskid));
         }
 
         private static async Task<string> MakeAsyncRequest(string url, string method = "GET", string req = null)

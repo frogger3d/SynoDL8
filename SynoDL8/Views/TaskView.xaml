@@ -6,12 +6,14 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    d:DesignHeight="300"
-    d:DesignWidth="400">
+    d:DesignHeight="100"
+    d:DesignWidth="600">
     
     <Grid Background="LightGray" Margin="5">
-        <StackPanel Orientation="Horizontal">
-            <TextBlock Text="{Binding Path=Title}" Foreground="Black" Padding="5"/>
+        <TextBlock Text="{Binding Path=Title}" Foreground="Black" Padding="5"/>
+        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button Style="{StaticResource PauseAppBarButtonStyle}" Command="{Binding PauseCommand}"/>
+            <Button Style="{StaticResource PlayAppBarButtonStyle}" Command="{Binding PlayCommand}"/>
         </StackPanel>
         <ProgressBar Value="{Binding Path=Progress}" VerticalAlignment="Bottom" Height="2" Minimum="0" Maximum="1"/>
     </Grid>

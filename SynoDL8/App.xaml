@@ -33,7 +33,10 @@
             </DataTemplate>
             
             <DataTemplate x:Key="tasksTemplate">
-                <ItemsControl ItemsSource="{Binding}" ItemTemplate="{StaticResource taskTemplate}" Background="Pink" Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                <ScrollViewer>
+                    <ItemsControl ItemsSource="{Binding}" ItemTemplate="{StaticResource taskTemplate}" 
+                                  Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                </ScrollViewer>
             </DataTemplate>
             
             <local:ContentDataTemplateSelector x:Key="ContentDataTemplateSelector"
