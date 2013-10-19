@@ -1,5 +1,5 @@
 ﻿using SynoDL8.Common;
-using SynoDL8.Views;
+using SynoDL8.View;
 using System;
 using System.Collections.Generic;
 using System.IO;

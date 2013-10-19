@@ -1,7 +1,7 @@
 ﻿namespace SynoDL8.DataModel
 {
     using Newtonsoft.Json.Linq;
-    using SynoDL8.ViewModels;
+    using SynoDL8.ViewModel;
     using System;
     using System.Collections.Generic;
     using System.IO;

@@ -27,7 +27,7 @@ using Windows.UI.ViewManagement;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
-namespace SynoDL8.Views
+namespace SynoDL8.View
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.

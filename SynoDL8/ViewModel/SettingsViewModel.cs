@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Storage;
 
-namespace SynoDL8.ViewModels
+namespace SynoDL8.ViewModel
 {
-    public class SettingsFlyoutViewModel : NotifyPropertyChanged
+    public class SettingsViewModel : NotifyPropertyChanged
     {
         public const string HostnameKey = "hostname";
         public const string UserKey = "user";
@@ -17,7 +17,7 @@ namespace SynoDL8.ViewModels
 
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
 
-        public SettingsFlyoutViewModel()
+        public SettingsViewModel()
         {
             this.Hostname = localSettings.Values[HostnameKey] as string ?? @"http://example.com";
             this.User = localSettings.Values[UserKey] as string ?? "user";

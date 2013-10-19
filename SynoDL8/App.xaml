@@ -2,11 +2,11 @@
     x:Class="SynoDL8.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:view="using:SynoDL8.Views"
+    xmlns:g="using:GalaSoft.MvvmLight.Command"
+    xmlns:view="using:SynoDL8.View"
     xmlns:local="using:SynoDL8"
     xmlns:localData="using:SynoDL8.Data"
-    xmlns:vm="using:SynoDL8.ViewModels"
-    >
+    xmlns:vm="using:SynoDL8.ViewModel">
 
     <Application.Resources>
         <ResourceDictionary>
@@ -23,7 +23,8 @@
 
             <x:String x:Key="AppName">SynoDL8</x:String>
 
-
+            <vm:ViewModelLocator x:Key="Locator" />
+            
             <DataTemplate x:Key="stringTemplate">
                 <TextBlock Text="{Binding}"/>
             </DataTemplate>
@@ -44,8 +45,6 @@
                                                TaskListTemplate="{StaticResource tasksTemplate}"
                                                />
 
-            <vm:ItemsViewModel x:Key="ItemsViewModel"/>
-            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

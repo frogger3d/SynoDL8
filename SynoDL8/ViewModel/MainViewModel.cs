@@ -1,8 +1,8 @@
-﻿namespace SynoDL8.ViewModels
+﻿namespace SynoDL8.ViewModel
 {
     using GalaSoft.MvvmLight;
     using SynoDL8.DataModel;
-    using SynoDL8.ViewModels;
+    using SynoDL8.ViewModel;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -10,18 +10,21 @@
     using System.Text;
     using System.Threading.Tasks;
     using System.Windows.Input;
+    using Windows.UI.Popups;
+    using Windows.UI.Xaml;
 
-    public class ItemsViewModel : ViewModelBase
+    public class MainViewModel : ViewModelBase
     {
         private readonly DSQuerier DSQuerier;
 
         private string message;
         private object content;
         private string url;
+        private bool busy;
 
-        public ItemsViewModel()
+        public MainViewModel()
         {
-            var settings = new SettingsFlyoutViewModel();
+            var settings = new SettingsViewModel();
             this.DSQuerier = new DSQuerier(settings.Hostname, settings.User, settings.Password);
 
             this.AuthCommand = new RelayCommand(this.Auth);
@@ -45,6 +48,21 @@
             set { this.Set("Url", ref this.url, value); }
         }
 
+        public bool Busy
+        {
+            get { return this.busy; }
+            private set
+            {
+                this.Set("Busy", ref this.busy, value);
+                this.RaisePropertyChanged(() => this.BusyV);
+            }
+        }
+
+        public Visibility BusyV
+        {
+            get { return this.busy ? Visibility.Visible : Visibility.Collapsed; }
+        }
+
         public string Message
         {
             get { return this.message; }
@@ -60,24 +78,30 @@
         private void Auth()
         {
             this.Message = "Authenticating";
+            this.Busy = true;
+
             Observable.StartAsync(this.DSQuerier.Login)
                       .ObserveOnDispatcher()
                       .Subscribe(
                           ev =>
                           {
                               this.Message = ev ? "Authenticated" : "Authentication failed";
+                              this.Busy = false;
                           },
-                          ex =>
+                          async ex =>
                           {
+#if DEBUG
                               this.Content = ex.ToString();
-                              this.Message = "Connection failed";
+#endif
+                              this.Busy = false;
+                              await new MessageDialog("Connection failed").ShowAsync();
                           });
         }
 
         private void Logout()
         {
-            this.Content = "..";
             this.Message = "Logging out";
+            this.Busy = true;
 
             Observable.StartAsync(this.DSQuerier.Logout)
                       .ObserveOnDispatcher()
@@ -85,11 +109,15 @@
                           ev =>
                           {
                               this.Message = ev ? "Logged out partial" : "Logging out failed";
+                              this.Busy = false;
                           },
-                          ex =>
+                          async ex =>
                           {
+#if DEBUG
                               this.Content = ex.ToString();
-                              this.Message = "Connection failed";
+#endif
+                              this.Busy = false;
+                              await new MessageDialog("Connection failed").ShowAsync();
                           });
         }
 
@@ -105,8 +133,8 @@
 
         private void Create()
         {
-            this.Content = "..";
             this.Message = "Starting download";
+            this.Busy = true;
 
             Observable.StartAsync(this.CreateDownload)
                       .ObserveOnDispatcher()
@@ -115,11 +143,15 @@
                           {
                               this.Content = ev;
                               this.Message = "Download started";
+                              this.Busy = false;
                           },
-                          ex =>
+                          async ex =>
                           {
+#if DEBUG
                               this.Content = ex.ToString();
-                              this.Message = "Start download failed";
+#endif
+                              this.Busy = false;
+                              await new MessageDialog("Start download failed").ShowAsync();
                           });
         }
 
@@ -132,8 +164,8 @@
 
         private void List()
         {
-            this.Content = "..";
             this.Message = "Getting download list";
+            this.Busy = true;
 
             Observable.StartAsync(this.DSQuerier.List)
                       .ObserveOnDispatcher()
@@ -142,11 +174,15 @@
                           {
                               this.Content = ev.ToList();
                               this.Message = "Download list retrieved";
+                              this.Busy = false;
                           },
-                          ex =>
+                          async ex =>
                           {
+#if DEBUG
                               this.Content = ex.ToString();
-                              this.Message = "Connection failed";
+#endif
+                              this.Busy = false;
+                              await new MessageDialog("Connection failed").ShowAsync();
                           });
         }
     }
