@@ -29,12 +29,6 @@ namespace SynoDL8
     /// </summary>
     sealed partial class App : Application
     {
-        // Desired width for the settings UI. UI guidelines specify this should be 346 or 646 depending on your needs.
-        private const double settingsWidth = 646;
-
-        // This is the container that will hold our custom content.
-        private Popup settingsPopup;
-
         /// <summary>
         /// Initializes the singleton Application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
