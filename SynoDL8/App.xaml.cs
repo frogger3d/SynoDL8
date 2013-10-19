@@ -87,7 +87,7 @@ namespace SynoDL8
             });
 
             // Create a SettingsFlyout the same dimenssions as the Popup.
-            SettingsFlyout mypane = new SettingsFlyout();
+            SynoSettingsFlyout mypane = new SynoSettingsFlyout();
             mypane.Width = settingsWidth;
             mypane.Height = Window.Current.Bounds.Height; // windowBounds.Height;
 

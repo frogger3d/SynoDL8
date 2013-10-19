@@ -1,5 +1,5 @@
-﻿<common:LayoutAwarePage
-    x:Class="SynoDL8.Views.SettingsFlyout"
+﻿<SettingsFlyout
+    x:Class="SynoDL8.Views.SynoSettingsFlyout"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SynoDL8.Views"
@@ -9,9 +9,10 @@
     xmlns:vm="using:SynoDL8.ViewModels"
     mc:Ignorable="d"
     d:DesignHeight="768"
-    d:DesignWidth="646">
+    d:DesignWidth="646"
+    BackClick="MySettingsBackClicked">
     
-    <UserControl.Resources>
+    <SettingsFlyout.Resources>
         <Style x:Key="SettingsBackButtonStyle" TargetType="Button">
             <Setter Property="MinWidth" Value="0"/>
             <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
@@ -108,60 +109,31 @@
                 </Setter.Value>
             </Setter>
         </Style>
-    </UserControl.Resources>
+    </SettingsFlyout.Resources>
     
-    <UserControl.DataContext>
+    <SettingsFlyout.DataContext>
         <vm:SettingsFlyoutViewModel/>
-    </UserControl.DataContext>
+    </SettingsFlyout.DataContext>
 
-    <Border BorderBrush="{StaticResource AppBarBorderThemeBrush}" BorderThickness="1,0,0,0">
-        <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" VerticalAlignment="Stretch">
-           
-            <!-- Root grid definition -->
-            <Grid.RowDefinitions>
-                <RowDefinition Height="80"/>
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+    <StackPanel x:Name="FlyoutContent">
+        <StackPanel.Resources>
+            <Style TargetType="TextBlock">
+                <Setter Property="Margin" Value="0 10 0 0"/>
+                <Setter Property="FontSize" Value="14"/>
+            </Style>
+        </StackPanel.Resources>
 
-            <!-- Header area for panel -->
-            <Grid Background="{StaticResource AppBarBackgroundThemeBrush}" Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+        <TextBlock>Hostname</TextBlock>
+        <TextBox Text="{Binding Path=Hostname, Mode=TwoWay}"/>
 
-                <StackPanel Orientation="Horizontal" Grid.Column="0" Margin="40, 32, 17, 13">
-                    <Button Click="MySettingsBackClicked" Margin="0,3,0,0"  Style="{StaticResource SettingsBackButtonStyle}"/>
-                    <TextBlock Margin="10,0,0,0" FontFamily="Segoe UI" FontWeight="SemiLight" FontSize="24.6667" Text="Defaults" Foreground="White"/>
-                    <Image Source="Assets/smalltile-sdk.png" Margin="400,0,6,0"/>
-                </StackPanel>
-            </Grid>
-
-            <!-- Settings Panel Content -->
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
-                <Grid Margin="40,33,40,39" VerticalAlignment="Top" Grid.RowSpan="3">
-                    <StackPanel x:Name="FlyoutContent">
-                        <StackPanel.Resources>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Margin" Value="0 10 0 0"/>
-                                <Setter Property="FontSize" Value="14"/>
-                            </Style>
-                        </StackPanel.Resources>
-
-                        <TextBlock>Hostname</TextBlock>
-                        <TextBox Text="{Binding Path=Hostname, Mode=TwoWay}"/>
-
-                        <TextBlock>User</TextBlock>
-                        <TextBox Text="{Binding Path=User, Mode=TwoWay}"/>
+        <TextBlock>User</TextBlock>
+        <TextBox Text="{Binding Path=User, Mode=TwoWay}"/>
                     
-                        <TextBlock>Password</TextBlock>
-                        <PasswordBox Password="{Binding Path=Password, Mode=TwoWay}"/>
+        <TextBlock>Password</TextBlock>
+        <PasswordBox Password="{Binding Path=Password, Mode=TwoWay}"/>
                     
-                        <Button Command="{Binding Path=SaveCommand}" Foreground="White" Margin="0 10">Save</Button>
+        <Button Command="{Binding Path=SaveCommand}" Foreground="White" Margin="0 10">Save</Button>
 
-                    </StackPanel>
-                </Grid>
-            </ScrollViewer>
-        </Grid>
-            
-    </Border>
-</common:LayoutAwarePage>
+    </StackPanel>
+    
+</SettingsFlyout>

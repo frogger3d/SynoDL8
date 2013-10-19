@@ -23,6 +23,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.ApplicationSettings;
 using Windows.UI.Xaml.Media.Animation;
+using Windows.UI.ViewManagement;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -31,23 +32,11 @@ namespace SynoDL8.Views
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class SettingsFlyout : SynoDL8.Common.LayoutAwarePage
+    public sealed partial class SynoSettingsFlyout : SettingsFlyout
     {
-        // The guidelines recommend using 100px offset for the content animation.
-        const int ContentAnimationOffset = 100;
-
-        // A pointer back to the main page.  This is needed if you want to call methods in MainPage such
-        // as NotifyUser()
-        //MainPage rootPage = MainPage.Current;
-
-        public SettingsFlyout()
+        public SynoSettingsFlyout()
         {
             this.InitializeComponent();
-            FlyoutContent.Transitions = new TransitionCollection();
-            FlyoutContent.Transitions.Add(new EntranceThemeTransition()
-            {
-                FromHorizontalOffset = (SettingsPane.Edge == SettingsEdgeLocation.Right) ? ContentAnimationOffset : (ContentAnimationOffset * -1)
-            });
         }
 
         /// <summary>
@@ -55,7 +44,7 @@ namespace SynoDL8.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void MySettingsBackClicked(object sender, RoutedEventArgs e)
+        private void MySettingsBackClicked(object sender, BackClickEventArgs e)
         {
             // First close our Flyout.
             Popup parent = this.Parent as Popup;
@@ -65,24 +54,9 @@ namespace SynoDL8.Views
             }
 
             // If the app is not snapped, then the back button shows the Settings pane again.
-            if (Windows.UI.ViewManagement.ApplicationView.Value != Windows.UI.ViewManagement.ApplicationViewState.Snapped)
+            if (ApplicationView.GetForCurrentView().IsFullScreen)
             {
                 SettingsPane.Show();
-            }
-        }
-
-        /// <summary>
-        /// This is the a common click handler for the buttons on the Flyout.  You would replace this with your own handler
-        /// if you have a button or buttons on this page.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void FlyoutButton_Click(object sender, RoutedEventArgs e)
-        {
-            Button b = sender as Button;
-            if (b != null)
-            {
-                //rootPage.NotifyUser("You selected the " + b.Content + " button", NotifyType.StatusMessage);
             }
         }
     }

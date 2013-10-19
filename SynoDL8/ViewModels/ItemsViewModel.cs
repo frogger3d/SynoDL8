@@ -103,7 +103,7 @@
             this.Content = await this.DSQuerier.GetInfo();
         }
 
-        private async void Create()
+        private void Create()
         {
             this.Content = "..";
             this.Message = "Starting download";
