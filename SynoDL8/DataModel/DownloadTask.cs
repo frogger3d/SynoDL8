@@ -1,5 +1,6 @@
 ﻿namespace SynoDL8.DataModel
 {
+    using GalaSoft.MvvmLight.Command;
     using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Generic;

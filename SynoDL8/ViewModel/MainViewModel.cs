@@ -1,6 +1,7 @@
 ﻿namespace SynoDL8.ViewModel
 {
     using GalaSoft.MvvmLight;
+    using GalaSoft.MvvmLight.Command;
     using SynoDL8.DataModel;
     using SynoDL8.ViewModel;
     using System;

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -9,7 +11,7 @@ using Windows.Storage;
 
 namespace SynoDL8.ViewModel
 {
-    public class SettingsViewModel : NotifyPropertyChanged
+    public class SettingsViewModel : ViewModelBase
     {
         public const string HostnameKey = "hostname";
         public const string UserKey = "user";
