@@ -59,45 +59,13 @@ namespace SynoDL8
         /// <param name="args">The <see cref="SettingsPaneCommandsRequestedEventArgs" /> instance containing the event data.</param>
         private void HandleCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
         {
-            args.Request.ApplicationCommands.Add(new SettingsCommand(
-                "Settings",
-                new ResourceLoader().GetString("Settings"),
-                this.OpenSettings));
-        }
-
-        private void OpenSettings(IUICommand command)
-        {
-            //rootPage.NotifyUser("Defaults command invoked", NotifyType.StatusMessage);
-
-            // Create a Popup window which will contain our flyout.
-            settingsPopup = new Popup();
-            //settingsPopup.Closed += OnPopupClosed;
-            //Window.Current.Activated += OnWindowActivated;
-            settingsPopup.IsLightDismissEnabled = true;
-            settingsPopup.Width = settingsWidth;
-            settingsPopup.Height = Window.Current.Bounds.Height; // windowBounds.Height;
-
-            // Add the proper animation for the panel.
-            settingsPopup.ChildTransitions = new TransitionCollection();
-            settingsPopup.ChildTransitions.Add(new PaneThemeTransition()
+            SettingsCommand updateCommand = new SettingsCommand("settings", "Settings", (handler) =>
             {
-                Edge = (SettingsPane.Edge == SettingsEdgeLocation.Right) ?
-                       EdgeTransitionLocation.Right :
-                       EdgeTransitionLocation.Left
+                SynoSettingsFlyout sf = new SynoSettingsFlyout();
+                sf.Show();
             });
 
-            // Create a SettingsFlyout the same dimenssions as the Popup.
-            SynoSettingsFlyout mypane = new SynoSettingsFlyout();
-            mypane.Width = settingsWidth;
-            mypane.Height = Window.Current.Bounds.Height; // windowBounds.Height;
-
-            // Place the SettingsFlyout inside our Popup window.
-            settingsPopup.Child = mypane;
-
-            // Let's define the location of our Popup.
-            settingsPopup.SetValue(Canvas.LeftProperty, SettingsPane.Edge == SettingsEdgeLocation.Right ? (Window.Current.Bounds.Width - settingsWidth) : 0);
-            settingsPopup.SetValue(Canvas.TopProperty, 0);
-            settingsPopup.IsOpen = true;
+            args.Request.ApplicationCommands.Add(updateCommand);
         }
 
         /// <summary>
