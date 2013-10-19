@@ -126,8 +126,8 @@
     <Compile Include="Common\RichTextColumns.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
     <Compile Include="ViewModels\ItemsViewModel.cs" />
-    <Compile Include="Views\SettingsFlyout.xaml.cs">
-      <DependentUpon>SettingsFlyout.xaml</DependentUpon>
+    <Compile Include="Views\SynoSettingsFlyout.xaml.cs">
+      <DependentUpon>SynoSettingsFlyout.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TaskView.xaml.cs">
       <DependentUpon>TaskView.xaml</DependentUpon>
@@ -155,7 +155,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\SettingsFlyout.xaml">
+    <Page Include="Views\SynoSettingsFlyout.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
