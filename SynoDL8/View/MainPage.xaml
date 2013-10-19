@@ -64,7 +64,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Button x:Name="backButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}" Style="{StaticResource BackButtonStyle}"/>
-            <TextBlock x:Name="pageTitle" Grid.Column="1" Text="{StaticResource AppName}" IsHitTestVisible="false" Style="{StaticResource PageHeaderTextStyle}"/>
+            <TextBlock x:Name="pageTitle" Grid.Column="1" x:Uid="applicationTitle" IsHitTestVisible="false" Style="{StaticResource PageHeaderTextStyle}"/>
             <TextBlock Grid.Column="1" VerticalAlignment="Bottom" Text="{Binding Path=Message}"/>
 
             <ProgressBar Visibility="{Binding Path=BusyV}" IsIndeterminate="True" VerticalAlignment="Bottom" Grid.ColumnSpan="3"/>

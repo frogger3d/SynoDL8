@@ -21,8 +21,6 @@
 
             <!-- Application-specific resources -->
 
-            <x:String x:Key="AppName">SynoDL8</x:String>
-
             <vm:ViewModelLocator x:Key="Locator" />
             
             <DataTemplate x:Key="stringTemplate">

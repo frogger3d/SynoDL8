@@ -11,7 +11,7 @@
     mc:Ignorable="d"
     d:DesignHeight="768"
     d:DesignWidth="323"
-    Title="Settings">
+    x:Uid="SynoSettingsFlyout">
 
     <SettingsFlyout.Resources>
         <Style TargetType="TextBlock">
@@ -22,16 +22,16 @@
     
     <StackPanel x:Name="FlyoutContent">
 
-        <TextBlock>Hostname</TextBlock>
+        <TextBlock x:Uid="hostname"/>
         <TextBox Text="{Binding Path=Hostname, Mode=TwoWay}"/>
 
-        <TextBlock>User</TextBlock>
+        <TextBlock x:Uid="user"/>
         <TextBox Text="{Binding Path=User, Mode=TwoWay}"/>
                     
-        <TextBlock>Password</TextBlock>
+        <TextBlock x:Uid="password"/>
         <PasswordBox Password="{Binding Path=Password, Mode=TwoWay}"/>
                     
-        <Button Command="{Binding Path=SaveCommand}" Foreground="White" Margin="0 10">Save</Button>
+        <Button Command="{Binding Path=SaveCommand}" Foreground="White" Margin="0 10" x:Uid="save"/>
 
     </StackPanel>
     

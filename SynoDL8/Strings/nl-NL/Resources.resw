@@ -117,7 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Settings" xml:space="preserve">
+  <data name="hostname.Text" xml:space="preserve">
+    <value>Hostnaam</value>
+  </data>
+  <data name="password.Text" xml:space="preserve">
+    <value>Wachtwoord</value>
+  </data>
+  <data name="save.Content" xml:space="preserve">
+    <value>Opslaan</value>
+  </data>
+  <data name="settings" xml:space="preserve">
     <value>Instellingen</value>
+  </data>
+  <data name="SynoSettingsFlyout.Title" xml:space="preserve">
+    <value>Instellingen</value>
+  </data>
+  <data name="user.Text" xml:space="preserve">
+    <value>Gebruiker</value>
   </data>
 </root>

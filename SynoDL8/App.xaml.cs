@@ -53,7 +53,8 @@ namespace SynoDL8
         /// <param name="args">The <see cref="SettingsPaneCommandsRequestedEventArgs" /> instance containing the event data.</param>
         private void HandleCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
         {
-            SettingsCommand updateCommand = new SettingsCommand("settings", "Settings", (handler) =>
+            var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
+            SettingsCommand updateCommand = new SettingsCommand("settings", loader.GetString("settings"), (handler) =>
             {
                 SynoSettingsFlyout sf = new SynoSettingsFlyout();
                 sf.Show();
