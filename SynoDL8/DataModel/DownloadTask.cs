@@ -1,7 +1,7 @@
 ﻿namespace SynoDL8.DataModel
 {
-    using GalaSoft.MvvmLight.Command;
     using Newtonsoft.Json.Linq;
+    using ReactiveUI;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -31,15 +31,15 @@
             get { return (double)this.SizeDownloaded / this.Size; }
         }
 
-        public ICommand PlayCommand { get; set; }
-        public ICommand PauseCommand { get; set; }
+        public ReactiveCommand PlayCommand { get; set; }
+        public ReactiveCommand PauseCommand { get; set; }
 
         public override string ToString()
         {
             return this.Title + " " + this.Id + " " + this.Status + " " + string.Format("{0:0.00%}", this.Progress);
         }
 
-        public static IEnumerable<DownloadTask> FromJason(string jasonString, DSQuerier dsquerier)
+        public static IEnumerable<DownloadTask> FromJason(string jasonString, SynologyDataModel dsquerier)
         {
             var root = JObject.Parse(jasonString);
             if ((bool)root["success"])
@@ -50,7 +50,7 @@
                     var transfer = additional["transfer"];
 
                     string taskid = (string)task["id"];
-                    yield return new DownloadTask()
+                    DownloadTask downloadTask = new DownloadTask()
                     {
                         Id = taskid,
                         Title = (string)task["title"],
@@ -60,9 +60,12 @@
                         SizeDownloaded = (long)transfer["size_downloaded"],
                         SpeedUpload = (long)transfer["speed_upload"],
                         SpeedDownload = (long)transfer["speed_download"],
-                        PlayCommand = new RelayCommand(() => dsquerier.Resume(taskid)),
-                        PauseCommand = new RelayCommand(() => dsquerier.Pause(taskid)),
+                        PlayCommand = new ReactiveCommand(),
+                        PauseCommand = new ReactiveCommand(),
                     };
+                    downloadTask.PlayCommand.Subscribe(_ => dsquerier.Resume(taskid));
+                    downloadTask.PauseCommand.Subscribe(_ => dsquerier.Pause(taskid));
+                    yield return downloadTask;
                 }
             }
             else

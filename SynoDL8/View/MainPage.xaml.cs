@@ -32,9 +32,9 @@ namespace SynoDL8.View
     /// A page that displays a collection of item previews.  In the Split Application this page
     /// is used to display and select one of the available groups.
     /// </summary>
-    public sealed partial class ItemsPage : SynoDL8.Common.LayoutAwarePage
+    public sealed partial class MainPage : SynoDL8.Common.LayoutAwarePage
     {
-        public ItemsPage()
+        public MainPage()
         {
             this.InitializeComponent();
         }

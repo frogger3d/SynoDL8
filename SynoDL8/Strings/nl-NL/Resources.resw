@@ -135,4 +135,7 @@
   <data name="user.Text" xml:space="preserve">
     <value>Gebruiker</value>
   </data>
+  <data name="signin.Content" xml:space="preserve">
+    <value>Aanmelden</value>
+  </data>
 </root>

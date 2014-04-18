@@ -19,20 +19,20 @@
             <Setter Property="FontSize" Value="14"/>
         </Style>
     </SettingsFlyout.Resources>
-    
-    <StackPanel x:Name="FlyoutContent">
 
+    <StackPanel Margin="10" Width="230">
+        
         <TextBlock x:Uid="hostname"/>
         <TextBox Text="{Binding Path=Hostname, Mode=TwoWay}"/>
 
         <TextBlock x:Uid="user"/>
         <TextBox Text="{Binding Path=User, Mode=TwoWay}"/>
-                    
+
         <TextBlock x:Uid="password"/>
-        <PasswordBox Password="{Binding Path=Password, Mode=TwoWay}"/>
-                    
+        <PasswordBox Password="{Binding Path=Password, Mode=TwoWay}" />
+
         <Button Command="{Binding Path=SaveCommand}" Foreground="White" Margin="0 10" x:Uid="save"/>
 
+        <TextBlock Text="{Binding Path=Errors}" Foreground="Red" TextWrapping="WrapWholeWords"/>
     </StackPanel>
-    
 </SettingsFlyout>

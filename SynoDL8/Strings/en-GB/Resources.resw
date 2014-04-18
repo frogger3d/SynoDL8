@@ -138,4 +138,10 @@
   <data name="user.Text" xml:space="preserve">
     <value>User</value>
   </data>
+  <data name="signin.Content" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="signinTitle.Text" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
 </root>

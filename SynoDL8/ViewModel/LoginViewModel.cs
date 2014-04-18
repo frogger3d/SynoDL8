@@ -1,36 +1,47 @@
 ﻿using ReactiveUI;
 using SynoDL8.DataModel;
+using SynoDL8.View;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Input;
-using Windows.Storage;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 
 namespace SynoDL8.ViewModel
 {
-    public class SettingsViewModel : ReactiveObject, INotifyDataErrorInfo
+    public class LoginViewModel : ReactiveObject, ILoginViewModel, INotifyDataErrorInfo
     {
         private readonly IConfigurationService ConfigurationService;
+        private readonly IDataModel DataModel;
 
         private readonly ObservableAsPropertyHelper<bool> hasErrors;
         private readonly ObservableAsPropertyHelper<string> errors;
+        private readonly ObservableAsPropertyHelper<Visibility> busyV;
 
         private string hostname, user, password;
+        private bool busy;
+        private string signinError;
 
-        public SettingsViewModel(IConfigurationService configurationService)
+        public LoginViewModel(IConfigurationService configurationService, IDataModel dataModel)
         {
             if (configurationService == null)
             {
                 throw new ArgumentNullException("configurationService");
             }
+            if (dataModel == null)
+            {
+                throw new ArgumentNullException("dataModel");
+            }
 
             this.ConfigurationService = configurationService;
+            this.DataModel = dataModel;
+
             var configuration = this.ConfigurationService.GetConfiguration();
             this.hostname = configuration.HostName;
             this.user = configuration.UserName;
@@ -52,11 +63,43 @@ namespace SynoDL8.ViewModel
             this.errors = hasErrorsObservable.Select(h => string.Join(Environment.NewLine, this.GetErrors(null)))
                                              .ToProperty(this, vm => vm.Errors);
 
-            this.SaveCommand = new ReactiveCommand(hasErrorsObservable.Select(e => !e));
-            this.SaveCommand.Subscribe(_ => this.Save());
+            this.SigninCommand = new ReactiveCommand(hasErrorsObservable.Select(e => !e));
+            this.SigninCommand.RegisterAsyncTask(_ => this.Signin())
+                              .Subscribe(
+                                n =>
+                                {
+                                    if (n)
+                                    {
+                                        ((Frame)Window.Current.Content).Navigate(typeof(MainPage));
+                                    }
+                                    else
+                                    {
+                                        signinError = "Signin failed";
+                                    }
+                                });
+
+            var busyObservable = this.ObservableForProperty(v => v.Busy, skipInitial: false);
+            this.busyV = busyObservable.Select(b => b.Value ? Visibility.Visible : Visibility.Collapsed)
+                                       .ToProperty(this, v => v.BusyV);
+
+            if(!this.HasErrors)
+            {
+                this.SigninCommand.Execute(null);
+            }
         }
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+
+        public bool Busy
+        {
+            get { return this.busy; }
+            private set { this.RaiseAndSetIfChanged(ref this.busy, value); }
+        }
+
+        public Visibility BusyV
+        {
+            get { return this.busyV.Value; }
+        }
 
         public string Hostname
         {
@@ -81,10 +124,11 @@ namespace SynoDL8.ViewModel
             get { return this.errors.Value; }
         }
 
-        public ReactiveCommand SaveCommand { get; private set; }
+        public ReactiveCommand SigninCommand { get; private set; }
 
-        private void Save()
+        private async Task<bool> Signin()
         {
+            this.Busy = true;
             var configuration = new Configuration()
             {
                 HostName = this.hostname,
@@ -92,6 +136,9 @@ namespace SynoDL8.ViewModel
                 UserName = this.user
             };
             this.ConfigurationService.SaveConfiguration(configuration);
+            var result = await this.DataModel.Login();
+            this.Busy = false;
+            return result;
         }
 
         IEnumerable INotifyDataErrorInfo.GetErrors(string propertyName)

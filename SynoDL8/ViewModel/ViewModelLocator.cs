@@ -12,9 +12,8 @@
   See http://www.galasoft.ch/mvvm
 */
 
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Ioc;
-using Microsoft.Practices.ServiceLocation;
+using Autofac;
+using SynoDL8.DataModel;
 
 namespace SynoDL8.ViewModel
 {
@@ -24,33 +23,23 @@ namespace SynoDL8.ViewModel
     /// </summary>
     public class ViewModelLocator
     {
+        private readonly IContainer Container;
+
         /// <summary>
         /// Initializes a new instance of the ViewModelLocator class.
         /// </summary>
         public ViewModelLocator()
         {
-            ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
-
-            ////if (ViewModelBase.IsInDesignModeStatic)
-            ////{
-            ////    // Create design time view services and models
-            ////    SimpleIoc.Default.Register<IDataService, DesignDataService>();
-            ////}
-            ////else
-            ////{
-            ////    // Create run time view services and models
-            ////    SimpleIoc.Default.Register<IDataService, DataService>();
-            ////}
-
-            SimpleIoc.Default.Register<MainViewModel>();
-            SimpleIoc.Default.Register<SettingsViewModel>();
+            var builder = new ContainerBuilder();
+            builder.RegisterModule(new SynoDownloadModule());
+            Container = builder.Build();
         }
 
-        public MainViewModel Main
+        public IMainViewModel Main
         {
             get
             {
-                return ServiceLocator.Current.GetInstance<MainViewModel>();
+                return this.Container.Resolve<IMainViewModel>();
             }
         }
 
@@ -58,7 +47,15 @@ namespace SynoDL8.ViewModel
         {
             get
             {
-                return ServiceLocator.Current.GetInstance<SettingsViewModel>();
+                return this.Container.Resolve<SettingsViewModel>();
+            }
+        }
+
+        public ILoginViewModel Login
+        {
+            get
+            {
+                return this.Container.Resolve<ILoginViewModel>();
             }
         }
         
