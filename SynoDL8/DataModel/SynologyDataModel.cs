@@ -2,10 +2,8 @@
 {
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using SynoDL8.ViewModel;
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using System.Net;
     using System.Net.Http;
@@ -29,8 +27,10 @@
 
         const string PauseQuery = @"http://{0}/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=pause&id={1}";
         const string ResumeQuery = @"http://{0}/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=resume&id={1}";
+        const string DeleteQuery = @"http://{0}/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=delete&id={1}&force_complete=false";
+        private readonly CookieContainer Cookies;
 
-        private static readonly CookieContainer Cookies = new CookieContainer();
+        private readonly HttpClient HttpClient;
 
         private readonly IConfigurationService ConfigurationService;
 
@@ -40,12 +40,10 @@
         
         public SynologyDataModel(IConfigurationService configurationService)
         {
-            if(configurationService == null)
-            {
-                throw new ArgumentNullException("configurationService");
-            }
+            this.HttpClient = new HttpClient();
+            this.Cookies = new CookieContainer();
 
-            this.ConfigurationService = configurationService;
+            this.ConfigurationService = configurationService.ThrowIfNull("configurationService");
             this.ConfigurationService.Changed += ConfigurationService_Changed;
             this.UpdateConfiguration();
         }
@@ -57,82 +55,68 @@
 
         public Task<bool> Login()
         {
-            return SynologyDataModel.MakeAsyncRequest(string.Format(LoginQuery, this.host, this.user, this.password))
-                            .ContinueWith(t =>
-                            {
-                                var o = JObject.Parse(t.Result);
-                                return (bool)o["success"];
-                            });
+            return this.GetAsync(string.Format(LoginQuery, this.host, this.user, this.password))
+                       .IsSuccess(SynologyResponse.GetAuthError);
         }
 
         public Task<bool> Logout()
         {
-            return SynologyDataModel.MakeAsyncRequest(string.Format(LogoutQuery, host))
-                            .ContinueWith(t =>
-                            {
-                                var o = JObject.Parse(t.Result);
-                                return (bool)o["success"];
-                            });
+            return this.GetAsync(string.Format(LogoutQuery, host))
+                       .IsSuccess(SynologyResponse.GetAuthError);
         }
 
-        public Task<string> GetVersions()
+        public async Task<string> GetVersions()
         {
-            return MakeAsyncRequest(string.Format(VersionQuery, host));
+            return Format(await this.GetAsync(string.Format(VersionQuery, host)));
         }
 
-        public Task<string> GetInfo()
+        public async Task<string> GetInfo()
         {
-            return MakeAsyncRequest(string.Format(InfoQuery, host));
+            return Format(await this.GetAsync(string.Format(InfoQuery, host)));
         }
 
         public Task<IEnumerable<DownloadTask>> List()
         {
-            return MakeAsyncRequest(string.Format(ListQuery, host))
-                      .ContinueWith(t => DownloadTask.FromJason(t.Result, this));
+            return this.GetAsync(string.Format(ListQuery, host))
+                       .ContinueWith(t => DownloadTask.FromJason(t.Result, this));
         }
 
-        public Task<string> Create(string url)
+        public Task<SynologyResponse> Create(string url)
         {
-            return MakeAsyncRequest(string.Format(CreateUri, host), method: "POST", req: string.Format(CreateRequest, url));
+            return this.PostAsync(string.Format(CreateUri, host), string.Format(CreateRequest, url)).ToResponse();
         }
 
-        public Task<string> Resume(string taskid)
+        public Task<bool> Resume(string taskid)
         {
-            return MakeAsyncRequest(string.Format(ResumeQuery, host, taskid));
+            return this.GetAsync(string.Format(ResumeQuery, host, taskid)).IsSuccess();
         }
 
-        public Task<string> Pause(string taskid)
+        public Task<bool> Pause(string taskid)
         {
-            return MakeAsyncRequest(string.Format(PauseQuery, host, taskid));
+            return this.GetAsync(string.Format(PauseQuery, host, taskid)).IsSuccess();
         }
 
-        private static async Task<string> MakeAsyncRequest(string url, string method = "GET", string req = null)
+        public Task<bool> Delete(string taskid)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.CookieContainer = Cookies;
-            request.ContinueTimeout = 10;
-            request.Method = method;
-            if (req != null)
-            {
-                using (Stream requestStream = await request.GetRequestStreamAsync())
-                using (StreamWriter sw = new StreamWriter(requestStream))
-                {
-                    await sw.WriteAsync(req);
-                }
-            }
-
-            WebResponse response = await request.GetResponseAsync();
-            return ReadStreamFromResponse(response);
+            return this.GetAsync(string.Format(DeleteQuery, host, taskid)).IsSuccess();
         }
 
-        private static string ReadStreamFromResponse(WebResponse response)
+        private async Task<string> PostAsync(string url, string content)
         {
-            using (Stream responseStream = response.GetResponseStream())
-            using (StreamReader sr = new StreamReader(responseStream))
-            {
-                string strContent = sr.ReadToEnd();
-                return Format(strContent);
-            }
+            var response = await this.HttpClient.PostAsync(url, new StringContent(content));
+            response.EnsureSuccessStatusCode();
+            // workaround for malformed header in Synology response
+            var bytes = await response.Content.ReadAsByteArrayAsync();
+            return UTF8Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+        }
+
+        private async Task<string> GetAsync(string url)
+        {
+            var response = await this.HttpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            // workaround for malformed header in Synology response
+            var bytes = await response.Content.ReadAsByteArrayAsync();
+            return UTF8Encoding.UTF8.GetString(bytes, 0, bytes.Length);
         }
 
         private static string Format(string json)

@@ -30,31 +30,6 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="1" Margin="0,9,0,-9">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250"/>
-                <ColumnDefinition Width="auto"/>
-            </Grid.ColumnDefinitions>
-            <VariableSizedWrapGrid MaximumRowsOrColumns="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="14,10" ItemWidth="200">
-                <VariableSizedWrapGrid.Resources>
-                    <Style TargetType="Button">
-                        <Setter Property="Margin" Value="2"/>
-                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                    </Style>
-                </VariableSizedWrapGrid.Resources>
-                <Button Command="{Binding Path=AuthCommand}">Auth</Button>
-                <Button Command="{Binding Path=LogoutCommand}">Logout</Button>
-                <Button Command="{Binding Path=VersionsCommand}">Versions</Button>
-                <Button Command="{Binding Path=InfoCommand}">Info</Button>
-                <Button Command="{Binding Path=ListCommand}">List</Button>
-                <TextBox Text="{Binding Path=Url, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                <Button Command="{Binding Path=CreateCommand}">Create</Button>
-            </VariableSizedWrapGrid>
-
-            <ContentControl FontSize="16" Grid.Column="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
-                            ContentTemplateSelector="{StaticResource ContentDataTemplateSelector}" Content="{Binding Path=Content}" />
-        </Grid>
-
         <!-- Back button and page title -->
         <Grid>
             <Grid.ColumnDefinitions>
@@ -62,11 +37,41 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Button x:Name="backButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}" Style="{StaticResource BackButtonStyle}"/>
-            <TextBlock x:Name="pageTitle" Grid.Column="1" x:Uid="applicationTitle" IsHitTestVisible="false" Style="{StaticResource PageHeaderTextStyle}"/>
-            <TextBlock Grid.Column="1" VerticalAlignment="Bottom" Text="{Binding Path=Message}"/>
-
-            <ProgressBar Visibility="{Binding Path=BusyV}" IsIndeterminate="True" VerticalAlignment="Bottom" Grid.ColumnSpan="3"/>
+            <TextBlock x:Name="pageTitle" Grid.Column="1" x:Uid="applicationTitle" Text="SynoDL8"
+                       IsHitTestVisible="false" Style="{StaticResource PageHeaderTextStyle}"/>
+            <TextBlock Grid.Column="1" VerticalAlignment="Bottom" Text="{Binding Message}"/>
         </Grid>
+
+        <Hub Grid.Row="1">
+            <HubSection Header="Actions">
+                <DataTemplate>
+                    <VariableSizedWrapGrid MaximumRowsOrColumns="1" Orientation="Horizontal" HorizontalAlignment="Center" ItemWidth="200">
+                        <VariableSizedWrapGrid.Resources>
+                            <Style TargetType="Button">
+                                <Setter Property="Margin" Value="2"/>
+                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                            </Style>
+                        </VariableSizedWrapGrid.Resources>
+                        <Button Command="{Binding VersionsCommand}" Content="Versions"/>
+                        <Button Command="{Binding InfoCommand}" Content="Info"/>
+                        <Button Command="{Binding ListCommand}" Content="List"/>
+                        <TextBox Text="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Command="{Binding CreateCommand}" Content="Create"/>
+                    </VariableSizedWrapGrid>
+                </DataTemplate>
+            </HubSection>
+            <HubSection Header="Downloads">
+                <DataTemplate>
+                    <ItemsControl ItemsSource="{Binding Content}" ItemTemplateSelector="{StaticResource ContentDataTemplateSelector}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsWrapGrid/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </DataTemplate>
+            </HubSection>
+        </Hub>
 
         <VisualStateManager.VisualStateGroups>
 

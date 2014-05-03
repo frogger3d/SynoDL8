@@ -1,13 +1,17 @@
 ﻿namespace SynoDL8.ViewModel
 {
     using ReactiveUI;
+    using ReactiveUI.Xaml;
     using SynoDL8.DataModel;
     using SynoDL8.ViewModel;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Reactive.Subjects;
+    using System.Reactive.Threading.Tasks;
     using System.Text;
     using System.Threading.Tasks;
     using System.Windows.Input;
@@ -20,7 +24,7 @@
         private readonly ObservableAsPropertyHelper<Visibility> busyV;
 
         private string message;
-        private object content;
+        private ReactiveList<DownloadTaskViewModel> content;
         private string url;
         private bool busy;
 
@@ -28,31 +32,30 @@
         {
             this.DataModel = dataModel;
 
-            var busyObservable = this.ObservableForProperty(v => v.Busy, skipInitial: false);
-            var readyObservable = busyObservable.Select(b => !b.Value);
+            var available = new BehaviorSubject<bool>(true);
 
-            this.AuthCommand = new ReactiveCommand(readyObservable);
-            this.LogoutCommand = new ReactiveCommand(readyObservable);
-            this.VersionsCommand = new ReactiveCommand(readyObservable);
-            this.InfoCommand = new ReactiveCommand(readyObservable);
-            this.ListCommand = new ReactiveCommand(readyObservable);
-            this.CreateCommand = new ReactiveCommand(readyObservable);
-            
-            this.AuthCommand.Subscribe(_ => this.Auth());
-            this.LogoutCommand.Subscribe(_ => this.Logout());
-            this.VersionsCommand.Subscribe(_ => this.Versions());
-            this.InfoCommand.Subscribe(_ => this.Info());
-            this.ListCommand.Subscribe(_ => this.List());
-            this.CreateCommand.Subscribe(_ => this.Create());
+            this.VersionsCommand = new ReactiveCommand(available);
+            this.InfoCommand = new ReactiveCommand(available);
+            this.ListCommand = new ReactiveCommand(available);
+            this.CreateCommand = new ReactiveCommand(available);
 
-            this.busyV = busyObservable.Select(b => b.Value ? Visibility.Visible : Visibility.Collapsed)
-                                       .ToProperty(this, v => v.BusyV);
+            Observable.CombineLatest(VersionsCommand.IsExecuting, InfoCommand.IsExecuting, ListCommand.IsExecuting, CreateCommand.IsExecuting, (v, i, l, c) => !(v || i || l || c))
+                      .Subscribe(n => available.OnNext(n));
 
+            this.VersionsCommand.RegisterAsyncTask(_ => this.Versions()).Subscribe(v => DisplayDialog(v));
+            this.InfoCommand.RegisterAsyncTask(_ => this.Info()).Subscribe(v => DisplayDialog(v));
+            this.ListCommand.RegisterAsyncTask(_ => this.List()).Subscribe();
+            this.CreateCommand.RegisterAsyncTask(url => this.Create(url)).Subscribe();
+
+            this.Content = new ReactiveList<DownloadTaskViewModel>();
             this.List();
         }
 
-        public ReactiveCommand AuthCommand { get; private set; }
-        public ReactiveCommand LogoutCommand { get; private set; }
+        private async void DisplayDialog(string v)
+        {
+            await new MessageDialog(v).ShowAsync();
+        }
+
         public ReactiveCommand VersionsCommand { get; private set; }
         public ReactiveCommand InfoCommand { get; private set; }
         public ReactiveCommand ListCommand { get; private set; }
@@ -64,138 +67,83 @@
             set { this.RaiseAndSetIfChanged(ref this.url, value); }
         }
 
-        public bool Busy
-        {
-            get { return this.busy; }
-            private set { this.RaiseAndSetIfChanged(ref this.busy, value); }
-        }
-
-        public Visibility BusyV
-        {
-            get { return this.busyV.Value; }
-        }
-
         public string Message
         {
             get { return this.message; }
             private set { this.RaiseAndSetIfChanged(ref message, value); }
         }
 
-        public object Content
+        public ReactiveList<DownloadTaskViewModel> Content
         {
             get { return this.content; }
             private set { this.RaiseAndSetIfChanged(ref content, value); }
         }
 
-        private void Auth()
+        private async Task<string> Versions()
         {
-            this.Message = "Authenticating";
-            this.Busy = true;
-
-            Observable.StartAsync(this.DataModel.Login)
-                      .ObserveOnDispatcher()
-                      .Subscribe(
-                          ev =>
-                          {
-                              this.Message = ev ? "Authenticated" : "Authentication failed";
-                              this.Busy = false;
-                          },
-                          async ex =>
-                          {
-#if DEBUG
-                              this.Content = ex.ToString();
-#endif
-                              this.Busy = false;
-                              await new MessageDialog("Connection failed" + Environment.NewLine + ex.ToString()).ShowAsync();
-                          });
+            return await this.DataModel.GetVersions();
         }
 
-        private void Logout()
+        private async Task<string> Info()
         {
-            this.Message = "Logging out";
-            this.Busy = true;
-
-            Observable.StartAsync(this.DataModel.Logout)
-                      .ObserveOnDispatcher()
-                      .Subscribe(
-                          ev =>
-                          {
-                              this.Message = ev ? "Logged out" : "Logging out failed";
-                              this.Busy = false;
-                          },
-                          async ex =>
-                          {
-#if DEBUG
-                              this.Content = ex.ToString();
-#endif
-                              this.Busy = false;
-                              await new MessageDialog("Connection failed").ShowAsync();
-                          });
+            return await this.DataModel.GetInfo();
         }
 
-        private async void Versions()
+        private async Task<bool> Create(object param)
         {
-            this.Content = await this.DataModel.GetVersions();
-        }
+            string url;
+            if (param is Uri)
+            {
+                url = param.ToString();
+            }
+            else
+            {
+                url = this.GetAndClearUrl();
+            }
 
-        private async void Info()
-        {
-            this.Content = await this.DataModel.GetInfo();
-        }
-
-        private void Create()
-        {
             this.Message = "Starting download";
-            this.Busy = true;
-
-            Observable.StartAsync(this.CreateDownload)
-                      .ObserveOnDispatcher()
-                      .Subscribe(
-                          ev =>
-                          {
-                              this.Content = ev;
-                              this.Message = "Download started";
-                              this.Busy = false;
-                          },
-                          async ex =>
-                          {
-#if DEBUG
-                              this.Content = ex.ToString();
-#endif
-                              this.Busy = false;
-                              await new MessageDialog("Start download failed").ShowAsync();
-                          });
+            var response = await this.DataModel.Create(url);
+            if (response.Success)
+            {
+                return await this.List();
+            }
+            else
+            {
+                await new MessageDialog(string.Format("Start download failed: {0} ({1})", response.Error, response.ErrorCode)).ShowAsync();
+                return false;
+            }
         }
 
-        private async Task<string> CreateDownload()
-        {
-            Task<string> createTask = this.DataModel.Create(this.Url);
-            this.Url = "";
-            return await createTask;
-        }
-
-        private void List()
+        private async Task<bool> List()
         {
             this.Message = "Getting download list";
-            this.Busy = true;
+            string dialogMessage = null;
+            try
+            {
+                var response = await this.DataModel.List();
+                using (this.Content.SuppressChangeNotifications())
+                {
+                    this.Content.Clear();
+                    this.Content.AddRange(response.Select(t => new DownloadTaskViewModel(this.DataModel, t)));
+                }
+                this.Message = "Download list retrieved";
+            }
+            catch (Exception e)
+            {
+                dialogMessage = "Connection failed " + e.Message;
+            }
 
-            Observable.StartAsync(this.DataModel.List)
-                      .ObserveOnDispatcher()
-                      .Subscribe(
-                          ev =>
-                          {
-                              this.Content = ev.ToList();
-                              this.Message = "Download list retrieved";
-                              this.Busy = false;
-                          },
-                          async ex =>
-                          {
-#if DEBUG
-                              this.Content = ex.ToString();
-#endif
-                              this.Busy = false;
-                              await new MessageDialog("Connection failed").ShowAsync();
-                          });
+            if (dialogMessage != null)
+                await new MessageDialog(dialogMessage).ShowAsync();
+
+            return dialogMessage != null;
+        }
+
+        private string GetAndClearUrl()
+        {
+            string result = this.Url;
+            this.Url = null;
+            return result;
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Text;
@@ -76,16 +77,16 @@ namespace SynoDL8.ViewModel
                                     {
                                         signinError = "Signin failed";
                                     }
+                                },
+                                e =>
+                                {
+                                    // TODO probably could not contact host
+                                    signinError = "Signin failed: " + e.ToString();
                                 });
 
-            var busyObservable = this.ObservableForProperty(v => v.Busy, skipInitial: false);
-            this.busyV = busyObservable.Select(b => b.Value ? Visibility.Visible : Visibility.Collapsed)
+            var busyObservable = this.SigninCommand.IsExecuting;
+            this.busyV = busyObservable.Select(b => b ? Visibility.Visible : Visibility.Collapsed)
                                        .ToProperty(this, v => v.BusyV);
-
-            if(!this.HasErrors)
-            {
-                this.SigninCommand.Execute(null);
-            }
         }
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
@@ -128,7 +129,6 @@ namespace SynoDL8.ViewModel
 
         private async Task<bool> Signin()
         {
-            this.Busy = true;
             var configuration = new Configuration()
             {
                 HostName = this.hostname,
@@ -136,8 +136,21 @@ namespace SynoDL8.ViewModel
                 UserName = this.user
             };
             this.ConfigurationService.SaveConfiguration(configuration);
-            var result = await this.DataModel.Login();
-            this.Busy = false;
+            
+            // TODO this is an ugly construction..
+            bool result;
+            try
+            {
+                result = await this.DataModel.Login();
+            }
+            catch(AggregateException e)
+            {
+                if (e.InnerException is WebException)
+                {
+                    return false;
+                }
+                else throw;
+            }
             return result;
         }
 

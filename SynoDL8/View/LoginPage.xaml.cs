@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ReactiveUI;
+using SynoDL8.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,11 +22,35 @@ namespace SynoDL8.View
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class LoginPage : Page
+    public sealed partial class LoginPage : Page, IViewFor<ILoginViewModel>
     {
+        public static readonly DependencyProperty ViewModelProperty =
+                DependencyProperty.Register("ViewModel", typeof(ILoginViewModel), typeof(LoginPage), new PropertyMetadata(null));
+
         public LoginPage()
         {
             this.InitializeComponent();
+            this.DataContextChanged += (s, e) => this.ViewModel = (ILoginViewModel)this.DataContext;
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            if (e.NavigationMode != NavigationMode.Back)
+            {
+                ((ILoginViewModel)this.DataContext).SigninCommand.Execute(null);
+            }
+        }
+
+        public ILoginViewModel ViewModel
+        {
+            get { return (ILoginViewModel)GetValue(ViewModelProperty); }
+            set { SetValue(ViewModelProperty, value); }
+        }
+
+        object IViewFor.ViewModel
+        {
+            get { return (ILoginViewModel)GetValue(ViewModelProperty); }
+            set { SetValue(ViewModelProperty, value); }
         }
     }
 }

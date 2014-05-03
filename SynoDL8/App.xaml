@@ -31,16 +31,9 @@
                 <view:TaskView />
             </DataTemplate>
             
-            <DataTemplate x:Key="tasksTemplate">
-                <ScrollViewer>
-                    <ItemsControl ItemsSource="{Binding}" ItemTemplate="{StaticResource taskTemplate}" 
-                                  Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                </ScrollViewer>
-            </DataTemplate>
-            
             <local:ContentDataTemplateSelector x:Key="ContentDataTemplateSelector"
                                                StringTemplate="{StaticResource stringTemplate}"
-                                               TaskListTemplate="{StaticResource tasksTemplate}"
+                                               TaskTemplate="{StaticResource taskTemplate}"
                                                />
 
         </ResourceDictionary>

@@ -58,6 +58,14 @@ namespace SynoDL8.ViewModel
                 return this.Container.Resolve<ILoginViewModel>();
             }
         }
+
+        public DownloadTaskViewModel Task
+        {
+            get
+            {
+                return this.Container.Resolve<DownloadTaskViewModel>();
+            }
+        }
         
         public static void Cleanup()
         {

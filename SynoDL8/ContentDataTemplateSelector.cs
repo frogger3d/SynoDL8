@@ -2,6 +2,7 @@
 namespace SynoDL8
 {
     using SynoDL8.DataModel;
+    using SynoDL8.ViewModel;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -13,7 +14,7 @@ namespace SynoDL8
 
     public class ContentDataTemplateSelector : DataTemplateSelector
     {
-        public DataTemplate TaskListTemplate { get; set; }
+        public DataTemplate TaskTemplate { get; set; }
         public DataTemplate ExceptionTemplate { get; set; }
         public DataTemplate StringTemplate { get; set; }
 
@@ -27,9 +28,9 @@ namespace SynoDL8
             {
                 return this.ExceptionTemplate;
             }
-            else if (item is List<DownloadTask>)
+            else if (item is DownloadTaskViewModel)
             {
-                return this.TaskListTemplate;
+                return this.TaskTemplate;
             }
 
             return null;

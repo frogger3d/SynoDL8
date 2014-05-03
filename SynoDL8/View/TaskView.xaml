@@ -1,20 +1,121 @@
 ﻿<UserControl
-    x:Class="SynoDL8.View.TaskView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SynoDL8.View"
+    xmlns:sdl8="using:SynoDL8"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    d:DesignHeight="100"
-    d:DesignWidth="600">
-    
-    <Grid Background="LightGray" Margin="5">
-        <TextBlock Text="{Binding Path=Title}" Foreground="Black" Padding="5"/>
-        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-            <Button Style="{StaticResource PauseAppBarButtonStyle}" Command="{Binding PauseCommand}"/>
-            <Button Style="{StaticResource PlayAppBarButtonStyle}" Command="{Binding PlayCommand}"/>
-        </StackPanel>
-        <ProgressBar Value="{Binding Path=Progress}" VerticalAlignment="Bottom" Height="2" Minimum="0" Maximum="1"/>
-    </Grid>
+    xmlns:Interactivity="using:Microsoft.Xaml.Interactivity" xmlns:Core="using:Microsoft.Xaml.Interactions.Core"
+    x:Class="SynoDL8.View.TaskView"
+    d:DataContext="{Binding Task, Source={StaticResource Locator}}"
+    mc:Ignorable="d" Height="100" Width="500"
+    sdl8:StateHelper.State="{Binding Path=VisualState}">
+
+    <Grid x:Name="grid1">
+        <VisualStateManager.VisualStateGroups>
+			<VisualStateGroup x:Name="StateGroup">
+                <VisualState x:Name="Normal">
+                    <Storyboard>
+                        <ColorAnimation Duration="0" To="#FF9393B2" Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)" Storyboard.TargetName="border" d:IsOptimized="True"/>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="playButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Visibility>Collapsed</Visibility>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="pauseButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Visibility>Collapsed</Visibility>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="Downloading">
+                    <Storyboard>
+                        <ColorAnimation Duration="0" To="#FF9393B2" Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)" Storyboard.TargetName="border" d:IsOptimized="True"/>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="playButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Visibility>Collapsed</Visibility>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="Finished">
+					<Storyboard>
+						<ColorAnimation Duration="0" To="#FFBECFAD" Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)" Storyboard.TargetName="border" d:IsOptimized="True"/>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="playButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Visibility>Collapsed</Visibility>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="pauseButton">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Visibility>Collapsed</Visibility>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+				</VisualState>
+				<VisualState x:Name="Paused">
+					<Storyboard>
+						<ColorAnimation Duration="0" To="#FFB877BB" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)" Storyboard.TargetName="grid" d:IsOptimized="True"/>
+						<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="pauseButton">
+							<DiscreteObjectKeyFrame KeyTime="0">
+								<DiscreteObjectKeyFrame.Value>
+									<Visibility>Collapsed</Visibility>
+								</DiscreteObjectKeyFrame.Value>
+							</DiscreteObjectKeyFrame>
+						</ObjectAnimationUsingKeyFrames>
+					</Storyboard>
+				</VisualState>
+			</VisualStateGroup>
+		</VisualStateManager.VisualStateGroups>
+
+		<Border x:Name="border" BorderBrush="#FFCDCDCD" BorderThickness="2" Margin="5" Padding="2" CornerRadius="1">
+			<Border.Background>
+				<LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+					<GradientStop Color="White" Offset="0"/>
+					<GradientStop Color="White" Offset="1"/>
+					<GradientStop Color="#FFA0A0A0" Offset="0.155"/>
+				</LinearGradientBrush>
+			</Border.Background>
+			<Grid x:Name="grid">
+				<Grid.Background>
+					<LinearGradientBrush EndPoint="1,0.5" StartPoint="0,0.5" Opacity="0.5">
+						<GradientStop Color="Black" Offset="1"/>
+						<GradientStop Color="White"/>
+						<GradientStop Color="LightGray" Offset="0.172"/>
+					</LinearGradientBrush>
+				</Grid.Background>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition/>
+					<ColumnDefinition Width="Auto"/>
+				</Grid.ColumnDefinitions>
+
+				<StackPanel Orientation="Vertical" MinWidth="500">
+					<TextBlock Text="{Binding Title}" Foreground="Black" Padding="5" FontWeight="SemiBold"/>
+					<TextBlock Text="{Binding Status}" Foreground="Black" Padding="5" FontWeight="SemiBold"/>
+				</StackPanel>
+        
+				<StackPanel x:Name="stackPanel" Grid.Column="1" Height="90" VerticalAlignment="Top" Orientation="Horizontal" HorizontalAlignment="Right">
+					<Button x:Name="playButton" Style="{StaticResource PlayAppBarButtonStyle}" Command="{Binding PlayCommand}" Height="90"/>
+                    <Button x:Name="pauseButton" Style="{StaticResource PauseAppBarButtonStyle}" Command="{Binding PauseCommand}" Height="90"/>
+                    <Button x:Name="deleteButton" Style="{StaticResource DeleteAppBarButtonStyle}" Command="{Binding PauseCommand}" Height="90"/>
+                </StackPanel>
+
+                <ProgressBar Value="{Binding Progress}" VerticalAlignment="Bottom" Height="2" Minimum="0" Maximum="1"
+					Grid.ColumnSpan="2"/>
+
+				<ProgressRing Width="80" Height="80" HorizontalAlignment="Right" VerticalAlignment="Center" IsActive="{Binding Busy}"/>
+			</Grid>
+		</Border>
+	</Grid>
 </UserControl>

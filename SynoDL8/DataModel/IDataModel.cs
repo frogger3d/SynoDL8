@@ -14,7 +14,12 @@ namespace SynoDL8.DataModel
         Task<bool> Logout();
         Task<string> GetVersions();
         Task<string> GetInfo();
-        Task<string> Create(string url);
+        Task<SynologyResponse> Create(string url);
+
+        Task<bool> Pause(string taskid);
+        Task<bool> Resume(string taskid);
+        Task<bool> Delete(string taskid);
+
         Task<IEnumerable<DownloadTask>> List();
     }
 }

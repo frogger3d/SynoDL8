@@ -28,9 +28,9 @@ namespace SynoDL8.DataModel
             return new Task<string>(() => "Lorem ipsum");
         }
 
-        public Task<string> Create(string url)
+        public Task<SynologyResponse> Create(string url)
         {
-            return new Task<string>(() => "Lorem ipsum");
+            return new Task<SynologyResponse>(() => new SynologyResponse());
         }
 
         public Task<IEnumerable<DownloadTask>> List()
@@ -43,6 +43,22 @@ namespace SynoDL8.DataModel
             yield return new DownloadTask() { Title = "Lorem ipsum" };
             yield return new DownloadTask() { Title = "Lorem ipsum" };
             yield return new DownloadTask() { Title = "Lorem ipsum" };
+        }
+
+
+        public Task<bool> Pause(string taskid)
+        {
+            return new Task<bool>(() => true);
+        }
+
+        public Task<bool> Resume(string taskid)
+        {
+            return new Task<bool>(() => true);
+        }
+
+        public Task<bool> Delete(string taskid)
+        {
+            return new Task<bool>(() => true);
         }
     }
 }

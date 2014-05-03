@@ -1,7 +1,10 @@
-﻿using SynoDL8.Common;
+﻿using ReactiveUI;
+using SynoDL8.Common;
 using SynoDL8.View;
+using SynoDL8.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Windows.ApplicationModel;
@@ -36,6 +39,9 @@ namespace SynoDL8
         public App()
         {
             this.InitializeComponent();
+
+            RxApp.MutableResolver.Register(() => new LoginPage(), typeof(IViewFor<LoginViewModel>));
+
             this.Suspending += OnSuspending;
         }
 
@@ -126,6 +132,16 @@ namespace SynoDL8
             var deferral = e.SuspendingOperation.GetDeferral();
             await SuspensionManager.SaveAsync();
             deferral.Complete();
+        }
+
+        protected override void OnActivated(IActivatedEventArgs args)
+        {
+            if (args.Kind == ActivationKind.Protocol)
+            {
+                ProtocolActivatedEventArgs protocolArgs = (ProtocolActivatedEventArgs)args;
+                var locator = (ViewModelLocator)this.Resources["Locator"];
+                locator.Main.CreateCommand.Execute(protocolArgs.Uri);
+            }
         }
     }
 }

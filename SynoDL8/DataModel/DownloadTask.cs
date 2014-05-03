@@ -11,14 +11,55 @@
 
     public class DownloadTask
     {
+        public enum status
+        {
+            unknown, // NOT IN OFFICIAL SDK
+            waiting,
+            downloading,
+            paused,
+            finishing,
+            finished,
+            hash_checking,
+            seeding,
+            filehosting_waiting,
+            extracting,
+            error,
+        };
+
+        public enum err_detail
+        {
+            none, // NOT IN OFFICIAL SDK
+            broken_link,
+            destination_not_exist,
+            destination_denied,
+            disk_full,
+            quota_reached,
+            timeout,
+            exceed_max_file_system_size,
+            exceed_max_destination_size,
+            exceed_max_temp_size,
+            encrypted_name_too_long,
+            name_too_long,
+            torrent_duplicate,
+            file_not_exist,
+            required_premium_account,
+            not_supported_type,
+            ftp_encryption_not_supported_type,
+            extract_failed,
+            extract_failed_wrong_password,
+            extract_failed_invalid_archive,
+            extract_failed_quota_reached,
+            extract_failed_disk_full,
+            unknown,
+        };
+
         public string Id { get; set; }
 
         public string Title { get; set; }
 
-        /// <summary>
-        /// Todo: find out all statuses
-        /// </summary>
-        public string Status { get; set; }
+        public status Status { get; set; }
+
+        public err_detail ErrorInfo { get; set; }
 
         public long Size { get; set; }
         public long SizeUploaded { get; set; }
@@ -26,23 +67,10 @@
         public long SpeedUpload { get; set; }
         public long SpeedDownload { get; set; }
 
-        public double Progress
-        {
-            get { return (double)this.SizeDownloaded / this.Size; }
-        }
-
-        public ReactiveCommand PlayCommand { get; set; }
-        public ReactiveCommand PauseCommand { get; set; }
-
-        public override string ToString()
-        {
-            return this.Title + " " + this.Id + " " + this.Status + " " + string.Format("{0:0.00%}", this.Progress);
-        }
-
         public static IEnumerable<DownloadTask> FromJason(string jasonString, SynologyDataModel dsquerier)
         {
             var root = JObject.Parse(jasonString);
-            if ((bool)root["success"])
+            if (SynologyResponse.FromJason(jasonString).Success)
             {
                 foreach (var task in root["data"]["tasks"])
                 {
@@ -55,22 +83,24 @@
                         Id = taskid,
                         Title = (string)task["title"],
                         Size = (long)task["size"],
-                        Status = (string)task["status"],
+                        Status = (status)Enum.Parse(typeof(status), (string)task["status"]),
                         SizeUploaded = (long)transfer["size_uploaded"],
                         SizeDownloaded = (long)transfer["size_downloaded"],
                         SpeedUpload = (long)transfer["speed_upload"],
                         SpeedDownload = (long)transfer["speed_download"],
-                        PlayCommand = new ReactiveCommand(),
-                        PauseCommand = new ReactiveCommand(),
                     };
-                    downloadTask.PlayCommand.Subscribe(_ => dsquerier.Resume(taskid));
-                    downloadTask.PauseCommand.Subscribe(_ => dsquerier.Pause(taskid));
+
+                    switch (downloadTask.Status)
+                    {
+                        case status.error:
+                            var status_extra = task["status_extra"];
+                            downloadTask.ErrorInfo = (err_detail)Enum.Parse(typeof(err_detail), (string)status_extra["error_detail"]);
+                            break;
+                    }
+
+
                     yield return downloadTask;
                 }
-            }
-            else
-            {
-                throw new InvalidOperationException("Failed to get download list");
             }
         }
     }

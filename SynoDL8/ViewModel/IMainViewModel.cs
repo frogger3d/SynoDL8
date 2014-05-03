@@ -16,17 +16,13 @@
 
     public interface IMainViewModel
     {
-        ReactiveCommand AuthCommand { get; }
-        ReactiveCommand LogoutCommand { get; }
         ReactiveCommand VersionsCommand { get; }
         ReactiveCommand InfoCommand { get; }
         ReactiveCommand ListCommand { get; }
         ReactiveCommand CreateCommand { get; }
 
         string Url { get;set;}
-        bool Busy { get; }
-        Visibility BusyV { get; }
         string Message { get; }
-        object Content { get; }
+        ReactiveList<DownloadTaskViewModel> Content { get; }
     }
 }
