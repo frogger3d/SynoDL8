@@ -42,15 +42,7 @@ namespace SynoDL8.ViewModel
                 return this.Container.Resolve<IMainViewModel>();
             }
         }
-
-        public SettingsViewModel Settings
-        {
-            get
-            {
-                return this.Container.Resolve<SettingsViewModel>();
-            }
-        }
-
+        
         public ILoginViewModel Login
         {
             get

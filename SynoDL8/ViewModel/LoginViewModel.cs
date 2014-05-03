@@ -5,12 +5,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -24,6 +26,7 @@ namespace SynoDL8.ViewModel
         private readonly ObservableAsPropertyHelper<bool> hasErrors;
         private readonly ObservableAsPropertyHelper<string> errors;
         private readonly ObservableAsPropertyHelper<Visibility> busyV;
+        private readonly ObservableAsPropertyHelper<bool> available;
 
         private string hostname, user, password;
         private bool busy;
@@ -48,21 +51,40 @@ namespace SynoDL8.ViewModel
             this.user = configuration.UserName;
             this.password = configuration.Password;
 
+            TimeSpan delay = TimeSpan.FromMilliseconds(100);
+
             var hostnameHasError = this.ObservableForProperty(v => v.Hostname, skipInitial: false)
+                                       .DistinctUntilChanged()
+                                       .Throttle(delay)
                                        .Select(o => this.GetErrors(o.PropertyName).Any())
-                                       .DistinctUntilChanged();
+                                       .Publish();
+
             var userHasError = this.ObservableForProperty(v => v.User, skipInitial: false)
+                                   .DistinctUntilChanged()
+                                   .Throttle(delay)
                                    .Select(o => this.GetErrors(o.PropertyName).Any())
-                                   .DistinctUntilChanged();
+                                   .Publish();
 
-            hostnameHasError.Subscribe(e => { this.RaiseErrorsChanged("HostName"); });
-            userHasError.Subscribe(e => { this.RaiseErrorsChanged("User"); });
+            var passwordHasError = this.ObservableForProperty(v => v.Password, skipInitial: false)
+                                       .DistinctUntilChanged()
+                                       .Throttle(delay)
+                                       .Select(o => this.GetErrors(o.PropertyName).Any())
+                                       .Publish();
 
-            var hasErrorsObservable = hostnameHasError.CombineLatest(userHasError, (a, b) => a || b);
-            this.hasErrors = hasErrorsObservable.ToProperty(this, vm => vm.HasErrors);
+            hostnameHasError.Subscribe(e => { Debug.WriteLine("Hostname : " + e); this.RaiseErrorsChanged("HostName"); });
+            userHasError.Subscribe(e => { Debug.WriteLine("user : " + e); this.RaiseErrorsChanged("User"); });
+            passwordHasError.Subscribe(e => { Debug.WriteLine("Password: " + e); this.RaiseErrorsChanged("Password"); });
+
+            var hasErrorsObservable = Observable.CombineLatest(hostnameHasError, userHasError, passwordHasError, (a, b, c) => a || b || c);
+            this.hasErrors = hasErrorsObservable//.DistinctUntilChanged()
+                                                .ToProperty(this, vm => vm.HasErrors);
 
             this.errors = hasErrorsObservable.Select(h => string.Join(Environment.NewLine, this.GetErrors(null)))
                                              .ToProperty(this, vm => vm.Errors);
+
+            hostnameHasError.Connect();
+            userHasError.Connect();
+            passwordHasError.Connect();
 
             this.SigninCommand = new ReactiveCommand(hasErrorsObservable.Select(e => !e));
             this.SigninCommand.RegisterAsyncTask(_ => this.Signin())
@@ -75,18 +97,15 @@ namespace SynoDL8.ViewModel
                                     }
                                     else
                                     {
-                                        signinError = "Signin failed";
+                                        this.SigninError = "Signin failed";
                                     }
-                                },
-                                e =>
-                                {
-                                    // TODO probably could not contact host
-                                    signinError = "Signin failed: " + e.ToString();
                                 });
 
             var busyObservable = this.SigninCommand.IsExecuting;
             this.busyV = busyObservable.Select(b => b ? Visibility.Visible : Visibility.Collapsed)
                                        .ToProperty(this, v => v.BusyV);
+            this.available= busyObservable.Select(b => !b)
+                                          .ToProperty(this, v => v.Available);
         }
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
@@ -95,6 +114,11 @@ namespace SynoDL8.ViewModel
         {
             get { return this.busy; }
             private set { this.RaiseAndSetIfChanged(ref this.busy, value); }
+        }
+
+        public bool Available
+        {
+            get { return this.available.Value; }
         }
 
         public Visibility BusyV
@@ -120,6 +144,12 @@ namespace SynoDL8.ViewModel
             set { this.RaiseAndSetIfChanged(ref this.password, value); }
         }
 
+        public string SigninError
+        {
+            get { return this.signinError; }
+            private set { this.RaiseAndSetIfChanged(ref this.signinError, value); }
+        }
+
         public string Errors
         {
             get { return this.errors.Value; }
@@ -129,6 +159,11 @@ namespace SynoDL8.ViewModel
 
         private async Task<bool> Signin()
         {
+            if (this.HasErrors)
+            {
+                return false;
+            }
+
             var configuration = new Configuration()
             {
                 HostName = this.hostname,
@@ -143,13 +178,9 @@ namespace SynoDL8.ViewModel
             {
                 result = await this.DataModel.Login();
             }
-            catch(AggregateException e)
+            catch (AggregateException)
             {
-                if (e.InnerException is WebException)
-                {
-                    return false;
-                }
-                else throw;
+                return false;
             }
             return result;
         }
@@ -165,26 +196,38 @@ namespace SynoDL8.ViewModel
 
             if (propertyName == "Hostname" || checkAll)
             {
-                int separatorIndex = this.Hostname.IndexOf(':');
-                string host = null;
-                if (separatorIndex < 1)
+                if (string.IsNullOrWhiteSpace(this.Hostname))
                 {
-                    host = this.Hostname;
+                    yield return "Host name is required.";
                 }
                 else
                 {
-                    host = this.Hostname.Substring(0, separatorIndex);
-                    string portString = this.Hostname.Substring(separatorIndex + 1);
-                    int port;
-                    if(!int.TryParse(portString, out port))
+                    Uri uri = null;
+                    string formatError = null;
+                    try
                     {
-                        yield return "Port part of host name not valid.";
+                        uri = new Uri(this.Hostname);
                     }
-                }
+                    catch(FormatException e)
+                    {
+                        formatError = e.Message;
+                    }
+                    if (formatError != null)
+                    {
+                        yield return formatError;
+                    }
 
-                if (Uri.CheckHostName(host) == UriHostNameType.Unknown)
-                {
-                    yield return "Host name not valid.";
+                    if (uri != null)
+                    {
+                        if (!(this.Hostname.StartsWith(@"http://") || this.Hostname.StartsWith(@"https://")))
+                        {
+                            yield return "Host name should start with either http:// or https://";
+                        }
+                        else if (uri.PathAndQuery != @"/")
+                        {
+                            yield return "Host name should not contain a path or qeury";
+                        }
+                    }
                 }
             }
 
@@ -192,7 +235,15 @@ namespace SynoDL8.ViewModel
             {
                 if (string.IsNullOrWhiteSpace(this.User))
                 {
-                    yield return "Username must be entered.";
+                    yield return "Username is required.";
+                }
+            }
+
+            if (propertyName == "Password" || checkAll)
+            {
+                if (string.IsNullOrWhiteSpace(this.Password))
+                {
+                    yield return "Password is required.";
                 }
             }
         }

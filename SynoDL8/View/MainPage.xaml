@@ -14,7 +14,8 @@
     <Page.BottomAppBar>
         <CommandBar>
             <AppBarButton Label="Refresh" Icon="Refresh" Command="{Binding Path=ListCommand}"/>
-            <AppBarButton Label="Help" Icon="Help" />
+            <AppBarButton Label="Versions" Command="{Binding VersionsCommand}" />
+            <AppBarButton Label="Info" Command="{Binding InfoCommand}" />
         </CommandBar>
     </Page.BottomAppBar>
 
@@ -52,8 +53,6 @@
                                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
                             </Style>
                         </VariableSizedWrapGrid.Resources>
-                        <Button Command="{Binding VersionsCommand}" Content="Versions"/>
-                        <Button Command="{Binding InfoCommand}" Content="Info"/>
                         <Button Command="{Binding ListCommand}" Content="List"/>
                         <TextBox Text="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         <Button Command="{Binding CreateCommand}" Content="Create"/>

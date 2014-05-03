@@ -60,13 +60,13 @@ namespace SynoDL8
         private void HandleCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
         {
             var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
-            SettingsCommand updateCommand = new SettingsCommand("settings", loader.GetString("settings"), (handler) =>
-            {
-                SynoSettingsFlyout sf = new SynoSettingsFlyout();
-                sf.Show();
-            });
+            //SettingsCommand updateCommand = new SettingsCommand("settings", loader.GetString("settings"), (handler) =>
+            //{
+            //    SynoSettingsFlyout sf = new SynoSettingsFlyout();
+            //    sf.Show();
+            //});
 
-            args.Request.ApplicationCommands.Add(updateCommand);
+            //args.Request.ApplicationCommands.Add(updateCommand);
         }
 
         /// <summary>

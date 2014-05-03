@@ -28,7 +28,6 @@ namespace SynoDL8
             }
             builder.RegisterType<ConfigurationService>().As<IConfigurationService>().SingleInstance();
             builder.RegisterType<LoginViewModel>().As<ILoginViewModel>();
-            builder.RegisterType<SettingsViewModel>().AsSelf();
         }
     }
 }

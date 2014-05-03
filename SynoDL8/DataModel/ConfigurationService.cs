@@ -21,9 +21,9 @@ namespace SynoDL8.DataModel
         {
             return new Configuration()
             {
-                HostName = localSettings.Values[HostnameKey] as string ?? "diskstation",
-                UserName = localSettings.Values[UserKey] as string ?? "user",
-                Password = localSettings.Values[PasswordKey] as string ?? "password",
+                HostName = localSettings.Values[HostnameKey] as string,
+                UserName = localSettings.Values[UserKey] as string,
+                Password = localSettings.Values[PasswordKey] as string,
             };
         }
         public void SaveConfiguration(Configuration configuration)

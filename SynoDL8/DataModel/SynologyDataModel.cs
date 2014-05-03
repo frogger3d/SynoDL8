@@ -12,22 +12,22 @@
 
     public class SynologyDataModel : IDataModel, IDisposable
     {
-        const string LoginQuery = @"http://{0}/webapi/auth.cgi?api=SYNO.API.Auth&version=2&method=login&account={1}&passwd={2}&session=DownloadStation&format=cookie";
+        const string LoginQuery = @"{0}/webapi/auth.cgi?api=SYNO.API.Auth&version=2&method=login&account={1}&passwd={2}&session=DownloadStation&format=cookie";
 
-        const string LogoutQuery = @"http://{0}/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session=DownloadStation";
+        const string LogoutQuery = @"{0}/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session=DownloadStation";
 
-        const string VersionQuery = @"http://{0}/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth,SYNO.DownloadStation.Task,SYNO.DownloadStation.Info,SYNO.DownloadStation.Schedule,SYNO.DownloadStation.Statistic";
+        const string VersionQuery = @"{0}/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth,SYNO.DownloadStation.Task,SYNO.DownloadStation.Info,SYNO.DownloadStation.Schedule,SYNO.DownloadStation.Statistic";
 
-        const string InfoQuery = @"http://{0}/webapi/DownloadStation/info.cgi?api=SYNO.DownloadStation.Info&version=1&method=getinfo";
+        const string InfoQuery = @"{0}/webapi/DownloadStation/info.cgi?api=SYNO.DownloadStation.Info&version=1&method=getinfo";
 
-        const string ListQuery = @"http://{0}/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=list&additional=transfer,detail";
+        const string ListQuery = @"{0}/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=list&additional=transfer,detail";
 
-        const string CreateUri = @"http://{0}/webapi/DownloadStation/task.cgi";
+        const string CreateUri = @"{0}/webapi/DownloadStation/task.cgi";
         const string CreateRequest = "api=SYNO.DownloadStation.Task&version=1&method=create&uri={0}";
 
-        const string PauseQuery = @"http://{0}/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=pause&id={1}";
-        const string ResumeQuery = @"http://{0}/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=resume&id={1}";
-        const string DeleteQuery = @"http://{0}/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=delete&id={1}&force_complete=false";
+        const string PauseQuery = @"{0}/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=pause&id={1}";
+        const string ResumeQuery = @"{0}/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=resume&id={1}";
+        const string DeleteQuery = @"{0}/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=delete&id={1}&force_complete=false";
         private readonly CookieContainer Cookies;
 
         private readonly HttpClient HttpClient;
@@ -133,7 +133,7 @@
         private void UpdateConfiguration()
         {
             var configuration = this.ConfigurationService.GetConfiguration();
-            this.host = configuration.HostName.TrimEnd('/');
+            this.host = (configuration.HostName ?? "").TrimEnd('/');
             this.user = configuration.UserName;
             this.password = configuration.Password;
         }
