@@ -21,12 +21,10 @@
     public class MainViewModel : ReactiveObject, IMainViewModel
     {
         private readonly IDataModel DataModel;
-        private readonly ObservableAsPropertyHelper<Visibility> busyV;
 
         private string message;
         private ReactiveList<DownloadTaskViewModel> content;
         private string url;
-        private bool busy;
 
         public MainViewModel(IDataModel dataModel)
         {
