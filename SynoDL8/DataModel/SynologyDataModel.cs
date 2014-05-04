@@ -20,6 +20,8 @@
 
         const string InfoQuery = @"{0}/webapi/DownloadStation/info.cgi?api=SYNO.DownloadStation.Info&version=1&method=getinfo";
 
+        const string StatisticsQuery = @"{0}/webapi/DownloadStation/statistic.cgi?api=SYNO.DownloadStation.Statistic&version=1&method=getinfo";
+
         const string ListQuery = @"{0}/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=list&additional=transfer,detail";
 
         const string CreateUri = @"{0}/webapi/DownloadStation/task.cgi";
@@ -73,6 +75,12 @@
         public async Task<string> GetInfo()
         {
             return Format(await this.GetAsync(string.Format(InfoQuery, host)));
+        }
+
+        public async Task<Statistics> GetStatistics()
+        {
+            var response = await this.GetAsync(string.Format(StatisticsQuery, host)).ToResponse();
+            return Statistics.FromResponse(response);
         }
 
         public Task<IEnumerable<DownloadTask>> List()

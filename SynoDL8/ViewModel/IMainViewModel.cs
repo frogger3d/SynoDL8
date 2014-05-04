@@ -24,5 +24,8 @@
         string Url { get;set;}
         string Message { get; }
         ReactiveList<DownloadTaskViewModel> Content { get; }
+
+        string UploadSpeed { get; }
+        string DownloadSpeed { get; }
     }
 }

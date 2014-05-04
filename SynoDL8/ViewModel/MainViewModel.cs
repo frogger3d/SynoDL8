@@ -21,14 +21,21 @@
     public class MainViewModel : ReactiveObject, IMainViewModel
     {
         private readonly IDataModel DataModel;
+        private readonly ObservableAsPropertyHelper<string> uploadSpeed;
+        private readonly ObservableAsPropertyHelper<string> downloadSpeed;
 
         private string message;
         private ReactiveList<DownloadTaskViewModel> content;
         private string url;
 
+        private IDisposable listSubscription;
+        private IDisposable statisticsSubscription;
+
         public MainViewModel(IDataModel dataModel)
         {
             this.DataModel = dataModel;
+
+            this.Content = new ReactiveList<DownloadTaskViewModel>();
 
             var available = new BehaviorSubject<bool>(true);
 
@@ -45,8 +52,23 @@
             this.ListCommand.RegisterAsyncTask(_ => this.List()).Subscribe();
             this.CreateCommand.RegisterAsyncTask(url => this.Create(url)).Subscribe();
 
-            this.Content = new ReactiveList<DownloadTaskViewModel>();
-            this.List();
+            this.listSubscription = Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(4))
+                                              .ObserveOnDispatcher()
+                                              .Select(t => Observable.FromAsync(this.List))
+                                              .Switch()
+                                              .Subscribe();
+
+            var statistics = Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(4))
+                                       .Select(_ => Observable.FromAsync(this.DataModel.GetStatistics))
+                                       .Switch()                                       
+                                       .Publish();
+
+            this.uploadSpeed = statistics.Select(s => (s == null) ? "" : s.UploadSpeed.ToString())
+                                           .ToProperty(this, v => v.UploadSpeed);
+            this.downloadSpeed = statistics.Select(s => (s == null) ? "" : s.UploadSpeed.ToString())
+                                           .ToProperty(this, v => v.DownloadSpeed);
+
+            this.statisticsSubscription = statistics.Connect();
         }
 
         private async void DisplayDialog(string v)
@@ -114,7 +136,6 @@
 
         private async Task<bool> List()
         {
-            this.Message = "Getting download list";
             string dialogMessage = null;
             try
             {
@@ -124,7 +145,6 @@
                     this.Content.Clear();
                     this.Content.AddRange(response.Select(t => new DownloadTaskViewModel(this.DataModel, t)));
                 }
-                this.Message = "Download list retrieved";
             }
             catch (Exception e)
             {
@@ -132,7 +152,9 @@
             }
 
             if (dialogMessage != null)
+            {
                 await new MessageDialog(dialogMessage).ShowAsync();
+            }
 
             return dialogMessage != null;
         }
@@ -142,6 +164,16 @@
             string result = this.Url;
             this.Url = null;
             return result;
+        }
+
+        public string UploadSpeed
+        {
+            get { return this.uploadSpeed.Value; }
+        }
+
+        public string DownloadSpeed
+        {
+            get { return this.downloadSpeed.Value; }
         }
     }
 }

@@ -56,6 +56,9 @@
                         <Button Command="{Binding ListCommand}" Content="List"/>
                         <TextBox Text="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         <Button Command="{Binding CreateCommand}" Content="Create"/>
+                        
+                        <TextBlock Text="{Binding Path=UploadSpeed}"/>
+                        <TextBlock Text="{Binding Path=DownloadSpeed}"/>
                     </VariableSizedWrapGrid>
                 </DataTemplate>
             </HubSection>

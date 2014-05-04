@@ -108,7 +108,7 @@
 				<StackPanel x:Name="stackPanel" Grid.Column="1" Height="90" VerticalAlignment="Top" Orientation="Horizontal" HorizontalAlignment="Right">
 					<Button x:Name="playButton" Style="{StaticResource PlayAppBarButtonStyle}" Command="{Binding PlayCommand}" Height="90"/>
                     <Button x:Name="pauseButton" Style="{StaticResource PauseAppBarButtonStyle}" Command="{Binding PauseCommand}" Height="90"/>
-                    <Button x:Name="deleteButton" Style="{StaticResource DeleteAppBarButtonStyle}" Command="{Binding PauseCommand}" Height="90"/>
+                    <Button x:Name="deleteButton" Style="{StaticResource DeleteAppBarButtonStyle}" Command="{Binding DeleteCommand}" Height="90"/>
                 </StackPanel>
 
                 <ProgressBar Value="{Binding Progress}" VerticalAlignment="Bottom" Height="2" Minimum="0" Maximum="1"

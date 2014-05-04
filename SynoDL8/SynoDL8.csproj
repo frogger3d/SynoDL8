@@ -116,6 +116,7 @@
     <Compile Include="DataModel\Configuration.cs" />
     <Compile Include="DataModel\DesignDataModel.cs" />
     <Compile Include="DataModel\DownloadTask.cs" />
+    <Compile Include="DataModel\Statistics.cs" />
     <Compile Include="DataModel\SynologyResponse.cs" />
     <Compile Include="StateHelper.cs" />
     <Compile Include="ViewModel\DesignMainViewModel.cs" />

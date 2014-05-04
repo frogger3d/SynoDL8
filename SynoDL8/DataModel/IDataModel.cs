@@ -14,6 +14,7 @@ namespace SynoDL8.DataModel
         Task<bool> Logout();
         Task<string> GetVersions();
         Task<string> GetInfo();
+        Task<Statistics> GetStatistics();
         Task<SynologyResponse> Create(string url);
 
         Task<bool> Pause(string taskid);

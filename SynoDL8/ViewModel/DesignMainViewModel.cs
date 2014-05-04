@@ -45,5 +45,15 @@ namespace SynoDL8.ViewModel
         {
             get { return this.downloadTasks; }
         }
+
+        public string UploadSpeed
+        {
+            get { return "45"; }
+        }
+
+        public string DownloadSpeed
+        {
+            get { return "560"; }
+        }
     }
 }
