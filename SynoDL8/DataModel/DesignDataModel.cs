@@ -33,9 +33,9 @@ namespace SynoDL8.DataModel
             return new Task<Statistics>(() => new Statistics(1000,45000));
         }
 
-        public Task<SynologyResponse> CreateDownloadAsync(string url)
+        public Task<SynologyResponse> CreateTaskAsync(string url)
         {
-            return new Task<SynologyResponse>(() => new SynologyResponse());
+            return default(Task<SynologyResponse>);
         }
 
         public Task<IEnumerable<DownloadTask>> List()
@@ -50,17 +50,17 @@ namespace SynoDL8.DataModel
             yield return new DownloadTask() { Title = "Lorem ipsum" };
         }
 
-        public Task<bool> Pause(string taskid)
+        public Task<bool> PauseTaskAsync(string taskid)
         {
             return new Task<bool>(() => true);
         }
 
-        public Task<bool> Resume(string taskid)
+        public Task<bool> ResumeTaskAsync(string taskid)
         {
             return new Task<bool>(() => true);
         }
 
-        public Task<bool> Delete(string taskid)
+        public Task<bool> DeleteTaskAsync(string taskid)
         {
             return new Task<bool>(() => true);
         }

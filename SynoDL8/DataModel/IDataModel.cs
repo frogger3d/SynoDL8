@@ -15,11 +15,11 @@ namespace SynoDL8.DataModel
         Task<string> GetVersionsAsync();
         Task<string> GetInfoAsync();
         Task<Statistics> GetStatisticsAsync();
-        Task<SynologyResponse> CreateDownloadAsync(string url);
+        Task<SynologyResponse> CreateTaskAsync(string url);
 
-        Task<bool> Pause(string taskid);
-        Task<bool> Resume(string taskid);
-        Task<bool> Delete(string taskid);
+        Task<bool> PauseTaskAsync(string taskid);
+        Task<bool> ResumeTaskAsync(string taskid);
+        Task<bool> DeleteTaskAsync(string taskid);
 
         Task<IEnumerable<DownloadTask>> List();
     }

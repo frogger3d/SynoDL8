@@ -59,10 +59,9 @@
         public async Task<bool> LoginAsync()
         {
             return await Observable.FromAsync(() => this.GetAsync(string.Format(LoginQuery, this.host, this.user, this.password)))
-                                   .Select(r => SynologyResponseMixins.IsSuccess(r, SynologyResponse.GetAuthError))
+                                   .Select(r => SynologyResponse.FromJason(r, SynologyResponse.GetAuthError).Success)
                                    .Timeout(TimeSpan.FromSeconds(3))
                                    .Retry(3);
-                             //.Subscribe(next => next, error => false);
         }
 
         public Task<bool> LogoutAsync()
@@ -87,30 +86,30 @@
             return Statistics.FromResponse(response);
         }
 
-        public Task<IEnumerable<DownloadTask>> List()
+        public async Task<IEnumerable<DownloadTask>> List()
         {
-            return this.GetAsync(string.Format(ListQuery, host))
-                       .ContinueWith(t => DownloadTask.FromJason(t.Result, this));
+            var response = await this.GetAsync(string.Format(ListQuery, host));
+            return DownloadTask.FromJason(response, this);
         }
 
-        public Task<SynologyResponse> CreateDownloadAsync(string url)
+        public async Task<SynologyResponse> CreateTaskAsync(string url)
         {
-            return this.PostAsync(string.Format(CreateUri, host), string.Format(CreateRequest, url)).ToResponse();
+            return await this.PostAsync(string.Format(CreateUri, host), string.Format(CreateRequest, url)).ToResponse();
         }
 
-        public Task<bool> Resume(string taskid)
+        public async Task<bool> ResumeTaskAsync(string taskid)
         {
-            return this.GetAsync(string.Format(ResumeQuery, host, taskid)).IsSuccess();
+            return await this.GetAsync(string.Format(ResumeQuery, host, taskid)).IsSuccess();
         }
 
-        public Task<bool> Pause(string taskid)
+        public async Task<bool> PauseTaskAsync(string taskid)
         {
-            return this.GetAsync(string.Format(PauseQuery, host, taskid)).IsSuccess();
+            return await this.GetAsync(string.Format(PauseQuery, host, taskid)).IsSuccess();
         }
 
-        public Task<bool> Delete(string taskid)
+        public async Task<bool> DeleteTaskAsync(string taskid)
         {
-            return this.GetAsync(string.Format(DeleteQuery, host, taskid)).IsSuccess();
+            return await this.GetAsync(string.Format(DeleteQuery, host, taskid)).IsSuccess();
         }
 
         private async Task<string> PostAsync(string url, string content)

@@ -122,7 +122,7 @@
             }
 
             this.Message = "Starting download";
-            var response = await this.DataModel.CreateDownloadAsync(url);
+            var response = await this.DataModel.CreateTaskAsync(url);
             if (response.Success)
             {
                 return await this.List();

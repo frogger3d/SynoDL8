@@ -36,9 +36,9 @@ namespace SynoDL8.ViewModel
             Observable.CombineLatest(PauseCommand.IsExecuting, PlayCommand.IsExecuting, (pa, pl) => !(pa || pl))
                       .Subscribe(n => areAllAvailable.OnNext(n));
 
-            this.PlayCommand.RegisterAsyncTask(_ => this.DataModel.Resume(this.Task.Id)).Subscribe();
-            this.PauseCommand.RegisterAsyncTask(_ => this.DataModel.Pause(this.Task.Id)).Subscribe();
-            this.DeleteCommand.RegisterAsyncTask(_ => this.DataModel.Delete(this.Task.Id)).Subscribe();
+            this.PlayCommand.RegisterAsyncTask(_ => this.DataModel.ResumeTaskAsync(this.Task.Id)).Subscribe();
+            this.PauseCommand.RegisterAsyncTask(_ => this.DataModel.PauseTaskAsync(this.Task.Id)).Subscribe();
+            this.DeleteCommand.RegisterAsyncTask(_ => this.DataModel.DeleteTaskAsync(this.Task.Id)).Subscribe();
         }
 
         public string VisualState
@@ -82,7 +82,7 @@ namespace SynoDL8.ViewModel
         {
             this.Busy = true;
 
-            this.DataModel.Pause(this.Task.Id)
+            this.DataModel.PauseTaskAsync(this.Task.Id)
                           .ToObservable()
                           .ObserveOnDispatcher()
                           .Subscribe(
@@ -101,7 +101,7 @@ namespace SynoDL8.ViewModel
         {
             this.Busy = true;
 
-            this.DataModel.Resume(this.Task.Id)
+            this.DataModel.ResumeTaskAsync(this.Task.Id)
                           .ToObservable()
                           .ObserveOnDispatcher()
                           .Subscribe(
