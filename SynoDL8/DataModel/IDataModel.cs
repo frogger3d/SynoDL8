@@ -10,12 +10,12 @@ namespace SynoDL8.DataModel
 {
     public interface IDataModel
     {
-        Task<bool> Login();
-        Task<bool> Logout();
-        Task<string> GetVersions();
-        Task<string> GetInfo();
-        Task<Statistics> GetStatistics();
-        Task<SynologyResponse> Create(string url);
+        Task<bool> LoginAsync();
+        Task<bool> LogoutAsync();
+        Task<string> GetVersionsAsync();
+        Task<string> GetInfoAsync();
+        Task<Statistics> GetStatisticsAsync();
+        Task<SynologyResponse> CreateDownloadAsync(string url);
 
         Task<bool> Pause(string taskid);
         Task<bool> Resume(string taskid);

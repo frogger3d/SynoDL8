@@ -59,7 +59,7 @@
                                               .Subscribe();
 
             var statistics = Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(4))
-                                       .Select(_ => Observable.FromAsync(this.DataModel.GetStatistics))
+                                       .Select(_ => Observable.FromAsync(this.DataModel.GetStatisticsAsync))
                                        .Switch()                                       
                                        .Publish();
 
@@ -101,12 +101,12 @@
 
         private async Task<string> Versions()
         {
-            return await this.DataModel.GetVersions();
+            return await this.DataModel.GetVersionsAsync();
         }
 
         private async Task<string> Info()
         {
-            return await this.DataModel.GetInfo();
+            return await this.DataModel.GetInfoAsync();
         }
 
         private async Task<bool> Create(object param)
@@ -122,7 +122,7 @@
             }
 
             this.Message = "Starting download";
-            var response = await this.DataModel.Create(url);
+            var response = await this.DataModel.CreateDownloadAsync(url);
             if (response.Success)
             {
                 return await this.List();

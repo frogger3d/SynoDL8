@@ -9,6 +9,17 @@ namespace SynoDL8.DataModel
 {
     public static class SynologyResponseMixins
     {
+        public static bool IsSuccess(string result, Func<int, string> errorLookup = null)
+        {
+            var response = ToResponse(result, errorLookup);
+            return response.Success;
+        }
+
+        public static SynologyResponse ToResponse(string result, Func<int, string> errorLookup = null)
+        {
+            return SynologyResponse.FromJason(result, errorLookup);
+        }
+
         public static async Task<bool> IsSuccess(this Task<string> task, Func<int, string> errorLookup = null)
         {
             var response = await task.ToResponse(errorLookup);

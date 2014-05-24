@@ -30,14 +30,16 @@ namespace SynoDL8.View
         public LoginPage()
         {
             this.InitializeComponent();
-            this.DataContextChanged += (s, e) => this.ViewModel = (ILoginViewModel)this.DataContext;
+            this.DataContextChanged += (s, e) =>
+                    this.ViewModel = (ILoginViewModel)this.DataContext;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             if (e.NavigationMode != NavigationMode.Back)
             {
-                ((ILoginViewModel)this.DataContext).SigninCommand.Execute(null);
+                if (this.ViewModel != null && this.ViewModel.SigninCommand.CanExecute(null))
+                    this.ViewModel.SigninCommand.Execute(null);
             }
         }
 

@@ -8,32 +8,32 @@ namespace SynoDL8.DataModel
 {
     internal class DesignDataModel : IDataModel
     {
-        public Task<bool> Login()
+        public Task<bool> LoginAsync()
         {
             return new Task<bool>(() => true);
         }
 
-        public Task<bool> Logout()
+        public Task<bool> LogoutAsync()
         {
             return new Task<bool>(() => true);
         }
 
-        public Task<string> GetVersions()
+        public Task<string> GetVersionsAsync()
         {
             return new Task<string>(() => "Lorem ipsum");
         }
 
-        public Task<string> GetInfo()
+        public Task<string> GetInfoAsync()
         {
             return new Task<string>(() => "Lorem ipsum");
         }
 
-        public Task<Statistics> GetStatistics()
+        public Task<Statistics> GetStatisticsAsync()
         {
             return new Task<Statistics>(() => new Statistics(1000,45000));
         }
 
-        public Task<SynologyResponse> Create(string url)
+        public Task<SynologyResponse> CreateDownloadAsync(string url)
         {
             return new Task<SynologyResponse>(() => new SynologyResponse());
         }

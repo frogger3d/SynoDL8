@@ -7,6 +7,7 @@
     using System.Linq;
     using System.Net;
     using System.Net.Http;
+    using System.Reactive.Linq;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -55,29 +56,32 @@
             this.ConfigurationService.Changed -= this.ConfigurationService_Changed;
         }
 
-        public Task<bool> Login()
+        public async Task<bool> LoginAsync()
         {
-            return this.GetAsync(string.Format(LoginQuery, this.host, this.user, this.password))
-                       .IsSuccess(SynologyResponse.GetAuthError);
+            return await Observable.FromAsync(() => this.GetAsync(string.Format(LoginQuery, this.host, this.user, this.password)))
+                                   .Select(r => SynologyResponseMixins.IsSuccess(r, SynologyResponse.GetAuthError))
+                                   .Timeout(TimeSpan.FromSeconds(3))
+                                   .Retry(3);
+                             //.Subscribe(next => next, error => false);
         }
 
-        public Task<bool> Logout()
+        public Task<bool> LogoutAsync()
         {
             return this.GetAsync(string.Format(LogoutQuery, host))
                        .IsSuccess(SynologyResponse.GetAuthError);
         }
 
-        public async Task<string> GetVersions()
+        public async Task<string> GetVersionsAsync()
         {
             return Format(await this.GetAsync(string.Format(VersionQuery, host)));
         }
 
-        public async Task<string> GetInfo()
+        public async Task<string> GetInfoAsync()
         {
             return Format(await this.GetAsync(string.Format(InfoQuery, host)));
         }
 
-        public async Task<Statistics> GetStatistics()
+        public async Task<Statistics> GetStatisticsAsync()
         {
             var response = await this.GetAsync(string.Format(StatisticsQuery, host)).ToResponse();
             return Statistics.FromResponse(response);
@@ -89,7 +93,7 @@
                        .ContinueWith(t => DownloadTask.FromJason(t.Result, this));
         }
 
-        public Task<SynologyResponse> Create(string url)
+        public Task<SynologyResponse> CreateDownloadAsync(string url)
         {
             return this.PostAsync(string.Format(CreateUri, host), string.Format(CreateRequest, url)).ToResponse();
         }

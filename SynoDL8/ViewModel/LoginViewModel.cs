@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Text;
@@ -95,10 +96,6 @@ namespace SynoDL8.ViewModel
                                     {
                                         ((Frame)Window.Current.Content).Navigate(typeof(MainPage));
                                     }
-                                    else
-                                    {
-                                        this.SigninError = "Signin failed";
-                                    }
                                 });
 
             var busyObservable = this.SigninCommand.IsExecuting;
@@ -176,12 +173,19 @@ namespace SynoDL8.ViewModel
             bool result;
             try
             {
-                result = await this.DataModel.Login();
+                result = await this.DataModel.LoginAsync();
             }
-            catch (AggregateException)
+            catch (HttpRequestException e)
             {
+                var inner = e.InnerException as WebException;
+                if(inner != null)
+                {
+                    this.SigninError = "Sign in error: " + inner.Status;
+                }
+
                 return false;
             }
+
             return result;
         }
 
