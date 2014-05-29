@@ -13,10 +13,6 @@ namespace SynoDL8.ViewModel
         ReactiveCommand SigninCommand { get; }
         bool Busy { get; }
         Visibility BusyV { get; }
-        string User { get; set; }
-        string Hostname { get; set; }
-        string Password { get; set; }
-        string Errors { get; }
         string SigninError { get; }
     }
 }

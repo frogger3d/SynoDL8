@@ -6,7 +6,8 @@
     xmlns:view="using:SynoDL8.View"
     xmlns:local="using:SynoDL8"
     xmlns:localData="using:SynoDL8.Data"
-    xmlns:vm="using:SynoDL8.ViewModel">
+    xmlns:vm="using:SynoDL8.ViewModel"
+    xmlns:converter="using:SynoDL8.Converters">
 
     <Application.Resources>
         <ResourceDictionary>
@@ -19,6 +20,8 @@
                 <ResourceDictionary Source="Common/StandardStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
+            <converter:TextToHeaderVisibilityConverter x:Key="TextToHeaderVisibilityConverter"/>
+            
             <!-- Application-specific resources -->
 
             <vm:ViewModelLocator x:Key="Locator" />
@@ -35,6 +38,61 @@
                                                StringTemplate="{StaticResource stringTemplate}"
                                                TaskTemplate="{StaticResource taskTemplate}"
                                                />
+
+            <Style x:Key="ErrorMessageStyle" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="Red" />
+                <Setter Property="Margin" Value="5,0" />
+                <Setter Property="FontSize" Value="{StaticResource ControlContentThemeFontSize}" />
+                <Setter Property="FontFamily" Value="{StaticResource ContentControlThemeFontFamily}" />
+            </Style>
+
+            <Style x:Key="BaseTextBoxStyle" TargetType="TextBox">
+                <Setter Property="HeaderTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <TextBlock Margin="0" Padding="0" Text="{Binding}" 
+                               Visibility="{Binding Converter={StaticResource TextToHeaderVisibilityConverter}}"/>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="VerticalAlignment" Value="Bottom" />
+            </Style>
+
+            <Style x:Key="HighlightTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource BaseTextBoxStyle}" >
+                <Setter Property="BorderBrush" Value="Red" />
+                <Setter Property="HeaderTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <TextBlock Margin="0" Padding="0" Foreground="Red" Text="{Binding}" 
+                               Visibility="{Binding Converter={StaticResource TextToHeaderVisibilityConverter}}"/>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="PasswordBox" x:Key="BasePasswordBoxStyle">
+                <Setter Property="HeaderTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <TextBlock Margin="0" Padding="0" Text="{Binding}" 
+                               Visibility="{Binding Converter={StaticResource TextToHeaderVisibilityConverter}}"/>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="VerticalAlignment" Value="Bottom" />
+            </Style>
+
+            <Style x:Key="HighlightPasswordBoxStyle" TargetType="PasswordBox" BasedOn="{StaticResource BasePasswordBoxStyle}" >
+                <Setter Property="BorderBrush" Value="Red" />
+                <Setter Property="HeaderTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <TextBlock Margin="0" Padding="0" Foreground="Red" Text="{Binding}" 
+                               Visibility="{Binding Converter={StaticResource TextToHeaderVisibilityConverter}}"/>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
         </ResourceDictionary>
     </Application.Resources>

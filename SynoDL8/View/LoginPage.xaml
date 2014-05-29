@@ -5,8 +5,16 @@
     xmlns:local="using:SynoDL8.View"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:i="using:Microsoft.Xaml.Interactivity"
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:behavior="using:SynoDL8.Behaviors"
+    xmlns:converter="using:SynoDL8.Converters"
     DataContext="{Binding Path=Login, Source={StaticResource Locator}}"
     mc:Ignorable="d">
+    
+    <Page.Resources>
+        <converter:FirstErrorConverter x:Key="FirstErrorConverter"/>
+    </Page.Resources>
     
     <Grid Style="{StaticResource LayoutRootStyle}">
 
@@ -21,18 +29,38 @@
                 <DataTemplate>
                     <StackPanel MinWidth="300">
                         <TextBlock x:Uid="hostname" Text="Hostname"/>
-                        <TextBox Text="{Binding Path=Hostname, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=Available}"/>
-                        
+                        <TextBox Text="{Binding Path=Credentials.Hostname, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=Available}">
+                            <i:Interaction.Behaviors>
+                                <behavior:HighlightFormFieldOnErrors PropertyErrors="{Binding Path=Credentials.Errors[Hostname]}" />
+                            </i:Interaction.Behaviors>
+                        </TextBox>
+                        <TextBlock Style="{StaticResource ErrorMessageStyle}"
+                                   Text="{Binding Credentials.Errors[Hostname], Converter={StaticResource FirstErrorConverter}}"
+                                   TextWrapping="Wrap" />
+
                         <TextBlock x:Uid="user" Text="User"/>
-                        <TextBox Text="{Binding Path=User, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=Available}"/>
+                        <TextBox Text="{Binding Path=Credentials.User, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=Available}">
+                            <i:Interaction.Behaviors>
+                                <behavior:HighlightFormFieldOnErrors PropertyErrors="{Binding Path=Credentials.Errors[User]}" />
+                            </i:Interaction.Behaviors>
+                        </TextBox>
+                        <TextBlock Style="{StaticResource ErrorMessageStyle}"
+                                   Text="{Binding Credentials.Errors[User], Converter={StaticResource FirstErrorConverter}}"
+                                   TextWrapping="Wrap" />
 
                         <TextBlock x:Uid="password" Text="Password"/>
-                        <PasswordBox Password="{Binding Path=Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=Available}"/>
+                        <PasswordBox Password="{Binding Path=Credentials.Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=Available}">
+                            <i:Interaction.Behaviors>
+                                <behavior:HighlightFormFieldOnErrors PropertyErrors="{Binding Path=Credentials.Errors[Password]}"
+                                                                     OriginalStyleName="BasePasswordBoxStyle" HighlightStyleName="HighlightPasswordBoxStyle" />
+                            </i:Interaction.Behaviors>
+                        </PasswordBox>
+                        <TextBlock Style="{StaticResource ErrorMessageStyle}"
+                                   Text="{Binding Credentials.Errors[Password], Converter={StaticResource FirstErrorConverter}}"
+                                   TextWrapping="Wrap" />
 
                         <Button Command="{Binding Path=SigninCommand}" Foreground="White" Margin="0 10" x:Uid="signin" Content="Sign in" HorizontalAlignment="Right"/>
 
-                        <TextBlock Foreground="Red" FontWeight="SemiBold" Text="{Binding Path=Errors}"/>
-                        
                         <TextBlock Foreground="Red" FontWeight="SemiBold" Text="{Binding Path=SigninError}"/>
                     </StackPanel>
                 </DataTemplate>

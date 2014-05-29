@@ -110,7 +110,12 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="ArgumentValidation.cs" />
+    <Compile Include="Behaviors\Behavior.cs" />
+    <Compile Include="Behaviors\HighlightFormFieldOnErrors.cs" />
     <Compile Include="ContentDataTemplateSelector.cs" />
+    <Compile Include="Converters\FirstErrorConverter.cs" />
+    <Compile Include="Converters\TextToHeaderVisibilityConverter.cs" />
+    <Compile Include="Model\Credentials.cs" />
     <Compile Include="Model\IConfigurationService.cs" />
     <Compile Include="Model\ConfigurationService.cs" />
     <Compile Include="Model\Configuration.cs" />
