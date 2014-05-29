@@ -118,7 +118,6 @@
     <Compile Include="Model\Credentials.cs" />
     <Compile Include="Model\IConfigurationService.cs" />
     <Compile Include="Model\ConfigurationService.cs" />
-    <Compile Include="Model\Configuration.cs" />
     <Compile Include="Model\DesignDataModel.cs" />
     <Compile Include="Model\DownloadTask.cs" />
     <Compile Include="Model\Statistics.cs" />

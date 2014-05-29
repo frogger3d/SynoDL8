@@ -9,8 +9,8 @@ namespace SynoDL8.Model
 {
     public interface IConfigurationService
     {
-        Configuration GetConfiguration();
-        void SaveConfiguration(Configuration configuration);
+        Credentials GetConfiguration();
+        void SaveConfiguration(Credentials credentials);
         event EventHandler Changed;
     }
 }

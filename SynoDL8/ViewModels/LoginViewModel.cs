@@ -110,21 +110,11 @@ namespace SynoDL8.ViewModels
                 return false;
             }
 
-            var configuration = new Configuration()
-            {
-                HostName = this.Credentials.Hostname,
-                Password = this.Credentials.Password,
-                UserName = this.Credentials.User
-            };
-            this.ConfigurationService.SaveConfiguration(configuration);
-
             this.SigninError = null;
 
-            // TODO this is an ugly construction..
-            bool result;
             try
             {
-                result = await this.DataModel.LoginAsync();
+                await this.DataModel.LoginAsync(credentials);
             }
             catch (HttpRequestException e)
             {
@@ -153,7 +143,8 @@ namespace SynoDL8.ViewModels
                 return false;
             }
 
-            return result;
+            this.ConfigurationService.SaveConfiguration(this.Credentials);
+            return true;
         }
     }
 }

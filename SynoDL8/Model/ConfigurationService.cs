@@ -17,19 +17,19 @@ namespace SynoDL8.Model
 
         public event EventHandler Changed;
 
-        public Configuration GetConfiguration()
+        public Credentials GetConfiguration()
         {
-            return new Configuration()
+            return new Credentials()
             {
-                HostName = localSettings.Values[HostnameKey] as string,
-                UserName = localSettings.Values[UserKey] as string,
+                Hostname = localSettings.Values[HostnameKey] as string,
+                User = localSettings.Values[UserKey] as string,
                 Password = localSettings.Values[PasswordKey] as string,
             };
         }
-        public void SaveConfiguration(Configuration configuration)
+        public void SaveConfiguration(Credentials configuration)
         {
-            localSettings.Values[HostnameKey] = configuration.HostName;
-            localSettings.Values[UserKey] = configuration.UserName;
+            localSettings.Values[HostnameKey] = configuration.Hostname;
+            localSettings.Values[UserKey] = configuration.User;
             localSettings.Values[PasswordKey] = configuration.Password;
             
             var handle = this.Changed;

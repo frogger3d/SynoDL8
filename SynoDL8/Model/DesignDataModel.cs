@@ -8,14 +8,14 @@ namespace SynoDL8.Model
 {
     internal class DesignDataModel : IDataModel
     {
-        public Task<bool> LoginAsync()
+        public Task<bool> LoginAsync(Credentials credentials)
         {
-            return new Task<bool>(() => true);
+            return default(Task<bool>);
         }
 
         public Task<bool> LogoutAsync()
         {
-            return new Task<bool>(() => true);
+            return default(Task<bool>);
         }
 
         public Task<string> GetVersionsAsync()

@@ -10,7 +10,7 @@ namespace SynoDL8.Model
 {
     public interface IDataModel
     {
-        Task<bool> LoginAsync();
+        Task<bool> LoginAsync(Credentials credentials);
         Task<bool> LogoutAsync();
         Task<string> GetVersionsAsync();
         Task<string> GetInfoAsync();

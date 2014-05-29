@@ -12,7 +12,7 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public class SynologyDataModel : IDataModel, IDisposable
+    public class SynologyDataModel : IDataModel
     {
         const string LoginQuery = @"{0}/webapi/auth.cgi?api=SYNO.API.Auth&version=2&method=login&account={1}&passwd={2}&session=DownloadStation&format=cookie";
 
@@ -36,30 +36,17 @@
 
         private readonly HttpClient HttpClient;
 
-        private readonly IConfigurationService ConfigurationService;
+        private Credentials credentials;
 
-        private string host;
-        private string user;
-        private string password;
-        
         public SynologyDataModel(IConfigurationService configurationService)
         {
             this.HttpClient = new HttpClient();
             this.Cookies = new CookieContainer();
-
-            this.ConfigurationService = configurationService.ThrowIfNull("configurationService");
-            this.ConfigurationService.Changed += ConfigurationService_Changed;
-            this.UpdateConfiguration();
         }
 
-        public void Dispose()
+        public async Task<bool> LoginAsync(Credentials credentials)
         {
-            this.ConfigurationService.Changed -= this.ConfigurationService_Changed;
-        }
-
-        public async Task<bool> LoginAsync()
-        {
-            var re = await Observable.FromAsync(() => this.GetAsync(string.Format(LoginQuery, this.host, this.user, this.password)))
+            var re = await Observable.FromAsync(() => this.GetAsync(string.Format(LoginQuery, credentials.Hostname, credentials.User, credentials.Password)))
                                      .Select(r => SynologyResponse.FromJason(r, SynologyResponse.GetAuthError))
                                      .Timeout(TimeSpan.FromSeconds(5))
                                      .Retry(3);
@@ -67,55 +54,66 @@
             {
                 throw new VerificationException(re.Error);
             }
+
+            this.credentials = credentials;
             return true;
         }
 
         public Task<bool> LogoutAsync()
         {
-            return this.GetAsync(string.Format(LogoutQuery, host))
+            CheckSignedin();
+            return this.GetAsync(string.Format(LogoutQuery, this.credentials.Hostname))
                        .IsSuccess(SynologyResponse.GetAuthError);
         }
 
         public async Task<string> GetVersionsAsync()
         {
-            return Format(await this.GetAsync(string.Format(VersionQuery, host)));
+            this.CheckSignedin();
+            return Format(await this.GetAsync(string.Format(VersionQuery, this.credentials.Hostname)));
         }
 
         public async Task<string> GetInfoAsync()
         {
-            return Format(await this.GetAsync(string.Format(InfoQuery, host)));
+            this.CheckSignedin();
+            return Format(await this.GetAsync(string.Format(InfoQuery, this.credentials.Hostname)));
         }
 
         public async Task<Statistics> GetStatisticsAsync()
         {
-            var response = await this.GetAsync(string.Format(StatisticsQuery, host)).ToResponse();
+            this.CheckSignedin();
+            var response = await this.GetAsync(string.Format(StatisticsQuery, this.credentials.Hostname)).ToResponse();
             return Statistics.FromResponse(response);
         }
 
         public async Task<IEnumerable<DownloadTask>> List()
         {
-            var response = await this.GetAsync(string.Format(ListQuery, host));
+            this.CheckSignedin();
+            var response = await this.GetAsync(string.Format(ListQuery, this.credentials.Hostname));
             return DownloadTask.FromJason(response, this);
         }
 
         public async Task<SynologyResponse> CreateTaskAsync(string url)
         {
-            return await this.PostAsync(string.Format(CreateUri, host), string.Format(CreateRequest, url)).ToResponse();
+            this.CheckSignedin();
+            return await this.PostAsync(string.Format(CreateUri, this.credentials.Hostname), string.Format(CreateRequest, url)).ToResponse();
         }
 
         public async Task<bool> ResumeTaskAsync(string taskid)
         {
-            return await this.GetAsync(string.Format(ResumeQuery, host, taskid)).IsSuccess();
+            this.CheckSignedin();
+            return await this.GetAsync(string.Format(ResumeQuery, this.credentials.Hostname, taskid)).IsSuccess();
         }
 
         public async Task<bool> PauseTaskAsync(string taskid)
         {
-            return await this.GetAsync(string.Format(PauseQuery, host, taskid)).IsSuccess();
+            this.CheckSignedin();
+            return await this.GetAsync(string.Format(PauseQuery, this.credentials.Hostname, taskid)).IsSuccess();
         }
 
         public async Task<bool> DeleteTaskAsync(string taskid)
         {
-            return await this.GetAsync(string.Format(DeleteQuery, host, taskid)).IsSuccess();
+            this.CheckSignedin();
+            return await this.GetAsync(string.Format(DeleteQuery, this.credentials.Hostname, taskid)).IsSuccess();
         }
 
         private async Task<string> PostAsync(string url, string content)
@@ -142,17 +140,12 @@
             return jt.ToString(Formatting.Indented);
         }
 
-        private void ConfigurationService_Changed(object sender, EventArgs e)
+        private void CheckSignedin()
         {
-            this.UpdateConfiguration();
-        }
-
-        private void UpdateConfiguration()
-        {
-            var configuration = this.ConfigurationService.GetConfiguration();
-            this.host = (configuration.HostName ?? "").TrimEnd('/');
-            this.user = configuration.UserName;
-            this.password = configuration.Password;
+            if(this.credentials == null)
+            {
+                throw new InvalidOperationException("Not signed in");
+            }
         }
     }
 }
