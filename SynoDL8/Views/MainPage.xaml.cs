@@ -33,7 +33,7 @@ namespace SynoDL8.Views
     /// A page that displays a collection of item previews.  In the Split Application this page
     /// is used to display and select one of the available groups.
     /// </summary>
-    public sealed partial class MainPage : Page
+    public sealed partial class MainPage : VisualStateAwarePage
     {
         public MainPage()
         {

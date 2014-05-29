@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Navigation;
 
 namespace SynoDL8.ViewModels
 {
@@ -150,12 +151,10 @@ namespace SynoDL8.ViewModels
 
         public void OnNavigatedFrom(Dictionary<string, object> viewModelState, bool suspending)
         {
-            throw new NotImplementedException();
         }
 
-        public void OnNavigatedTo(object navigationParameter, Windows.UI.Xaml.Navigation.NavigationMode navigationMode, Dictionary<string, object> viewModelState)
+        public void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)
         {
-            throw new NotImplementedException();
         }
     }
 }

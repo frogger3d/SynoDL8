@@ -24,6 +24,7 @@ using Windows.UI.Xaml.Navigation;
 using Autofac;
 using Microsoft.Practices.Prism.StoreApps;
 using SynoDL8.Model;
+using System.Threading.Tasks;
 
 // The Split App template is documented at http://go.microsoft.com/fwlink/?LinkId=234228
 
@@ -32,9 +33,9 @@ namespace SynoDL8
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
-    sealed partial class App : Application
+    sealed partial class App : MvvmAppBase
     {
-        private readonly IContainer Container;
+        private IContainer container;
             
         /// <summary>
         /// Initializes the singleton Application object.  This is the first line of authored code
@@ -43,106 +44,33 @@ namespace SynoDL8
         public App()
         {
             this.InitializeComponent();
+        }
 
+        protected override void OnInitialize(IActivatedEventArgs args)
+        {
             ContainerBuilder builder = new ContainerBuilder();
             builder.RegisterModule(new SynoDownloadModule());
-            this.Container = builder.Build();
+            this.container = builder.Build();
 
             ViewModelLocator.SetDefaultViewTypeToViewModelTypeResolver(viewtype =>
-                {
-                    if (viewtype == typeof(MainPage))
-                        return typeof(IMainViewModel);
-                    if (viewtype == typeof(LoginPage))
-                        return typeof(ILoginViewModel);
-                    return null;
-                });
+            {
+                if (viewtype == typeof(MainPage))
+                    return typeof(IMainViewModel);
+                if (viewtype == typeof(LoginPage))
+                    return typeof(ILoginViewModel);
+                return null;
+            });
 
             ViewModelLocator.SetDefaultViewModelFactory(vmtype =>
-                {
-                    return this.Container.Resolve(vmtype);
-                });
-
-            this.Suspending += OnSuspending;
+            {
+                return this.container.Resolve(vmtype);
+            });
         }
 
-        /// <summary>
-        /// Invoked when the application is launched normally by the end user.  Other entry points
-        /// will be used when the application is launched to open a specific file, to display
-        /// search results, and so forth.
-        /// </summary>
-        /// <param name="args">Details about the launch request and process.</param>
-        protected override async void OnLaunched(LaunchActivatedEventArgs e)
+        protected override Task OnLaunchApplication(LaunchActivatedEventArgs args)
         {
-
-#if DEBUG
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                this.DebugSettings.EnableFrameRateCounter = true;
-            }
-#endif
-
-            Frame rootFrame = Window.Current.Content as Frame;
-
-            // Do not repeat app initialization when the Window already has content,
-            // just ensure that the window is active
-            
-            if (rootFrame == null)
-            {
-                // Create a Frame to act as the navigation context and navigate to the first page
-                rootFrame = new Frame();
-                //Associate the frame with a SuspensionManager key                                
-                SuspensionManager.RegisterFrame(rootFrame, "AppFrame");
-
-                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
-                {
-                    // Restore the saved session state only when appropriate
-                    try
-                    {
-                        await SuspensionManager.RestoreAsync();
-                    }
-                    catch (SuspensionManagerException)
-                    {
-                        //Something went wrong restoring state.
-                        //Assume there is no state and continue
-                    }
-                }
-
-                // Place the frame in the current Window
-                Window.Current.Content = rootFrame;
-            }
-            if (rootFrame.Content == null)
-            {
-                // When the navigation stack isn't restored navigate to the first page,
-                // configuring the new page by passing required information as a navigation
-                // parameter
-                rootFrame.Navigate(typeof(LoginPage), e.Arguments);
-            }
-            // Ensure the current window is active
-            Window.Current.Activate();
-        }
-
-        /// <summary>
-        /// Invoked when application execution is being suspended.  Application state is saved
-        /// without knowing whether the application will be terminated or resumed with the contents
-        /// of memory still intact.
-        /// </summary>
-        /// <param name="sender">The source of the suspend request.</param>
-        /// <param name="e">Details about the suspend request.</param>
-        private async void OnSuspending(object sender, SuspendingEventArgs e)
-        {
-            var deferral = e.SuspendingOperation.GetDeferral();
-            await SuspensionManager.SaveAsync();
-            deferral.Complete();
-        }
-
-        protected override void OnActivated(IActivatedEventArgs args)
-        {
-            if (args.Kind == ActivationKind.Protocol)
-            {
-                ProtocolActivatedEventArgs protocolArgs = (ProtocolActivatedEventArgs)args;
-                throw new NotImplementedException();
-                // Browse to main page and start download
-            }
+            NavigationService.Navigate("Login", null);
+            return Task.FromResult<object>(null);
         }
     }
 }

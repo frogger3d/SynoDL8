@@ -1,4 +1,4 @@
-﻿<Page
+﻿<prism:VisualStateAwarePage
     x:Name="pageRoot"
     x:Class="SynoDL8.Views.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -38,7 +38,7 @@
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="backButton" Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
+            <Button x:Name="backButton" Command="{Binding Path=GoBackCommand, ElementName=pageRoot}"
                     Margin="39,59,39,0" Style="{StaticResource NavigationBackButtonNormalStyle}"/>
             <TextBlock x:Name="pageTitle" Grid.Column="1" x:Uid="applicationTitle" Text="SynoDL8" Margin="0,0,0,40" VerticalAlignment="Bottom"
                        IsHitTestVisible="false" Style="{StaticResource HeaderTextBlockStyle}"/>
@@ -77,4 +77,4 @@
             </HubSection>
         </Hub>
     </Grid>
-</Page>
+</prism:VisualStateAwarePage>

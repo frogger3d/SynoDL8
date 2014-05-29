@@ -140,7 +140,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Common\BooleanToVisibilityConverter.cs" />
     <Compile Include="Common\BooleanNegationConverter.cs" />
-    <Compile Include="Common\SuspensionManager.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Views\TaskView.xaml.cs">
       <DependentUpon>TaskView.xaml</DependentUpon>
