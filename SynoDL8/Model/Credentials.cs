@@ -87,8 +87,14 @@ namespace SynoDL8.Model
                 return new ValidationResult(e.Message);
             }
 
-
-            return ValidationResult.Success;
+            if (isValid)
+            {
+                return ValidationResult.Success;
+            }
+            else
+            {
+                return new ValidationResult("Error in hostname");
+            }
         }
     }
 }

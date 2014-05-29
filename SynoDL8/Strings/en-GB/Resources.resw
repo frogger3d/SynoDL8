@@ -120,10 +120,10 @@
   <data name="applicationTitle.Text" xml:space="preserve">
     <value>SynoDL8</value>
   </data>
-  <data name="hostname.Text" xml:space="preserve">
+  <data name="hostname.Header" xml:space="preserve">
     <value>Hostname</value>
   </data>
-  <data name="password.Text" xml:space="preserve">
+  <data name="password.Header" xml:space="preserve">
     <value>Password</value>
   </data>
   <data name="save.Content" xml:space="preserve">
@@ -135,7 +135,7 @@
   <data name="SynoSettingsFlyout.Title" xml:space="preserve">
     <value>Settings</value>
   </data>
-  <data name="user.Text" xml:space="preserve">
+  <data name="user.Header" xml:space="preserve">
     <value>User</value>
   </data>
   <data name="signin.Content" xml:space="preserve">

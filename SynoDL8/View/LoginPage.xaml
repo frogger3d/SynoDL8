@@ -28,8 +28,8 @@
             <HubSection>
                 <DataTemplate>
                     <StackPanel MinWidth="300">
-                        <TextBlock x:Uid="hostname" Text="Hostname"/>
-                        <TextBox Text="{Binding Path=Credentials.Hostname, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=Available}">
+                        <TextBox x:Uid="hostname" Header="Hostname"
+                                 Text="{Binding Path=Credentials.Hostname, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=Available}">
                             <i:Interaction.Behaviors>
                                 <behavior:HighlightFormFieldOnErrors PropertyErrors="{Binding Path=Credentials.Errors[Hostname]}" />
                             </i:Interaction.Behaviors>
@@ -38,8 +38,8 @@
                                    Text="{Binding Credentials.Errors[Hostname], Converter={StaticResource FirstErrorConverter}}"
                                    TextWrapping="Wrap" />
 
-                        <TextBlock x:Uid="user" Text="User"/>
-                        <TextBox Text="{Binding Path=Credentials.User, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=Available}">
+                        <TextBox x:Uid="user" Header="User"
+                                 Text="{Binding Path=Credentials.User, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=Available}">
                             <i:Interaction.Behaviors>
                                 <behavior:HighlightFormFieldOnErrors PropertyErrors="{Binding Path=Credentials.Errors[User]}" />
                             </i:Interaction.Behaviors>
@@ -48,8 +48,8 @@
                                    Text="{Binding Credentials.Errors[User], Converter={StaticResource FirstErrorConverter}}"
                                    TextWrapping="Wrap" />
 
-                        <TextBlock x:Uid="password" Text="Password"/>
-                        <PasswordBox Password="{Binding Path=Credentials.Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=Available}">
+                        <PasswordBox x:Uid="password" Header="Password"
+                                     Password="{Binding Path=Credentials.Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=Available}">
                             <i:Interaction.Behaviors>
                                 <behavior:HighlightFormFieldOnErrors PropertyErrors="{Binding Path=Credentials.Errors[Password]}"
                                                                      OriginalStyleName="BasePasswordBoxStyle" HighlightStyleName="HighlightPasswordBoxStyle" />
