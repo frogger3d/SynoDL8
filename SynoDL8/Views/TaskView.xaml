@@ -9,7 +9,7 @@
     xmlns:Core="using:Microsoft.Xaml.Interactions.Core"
     xmlns:prism="using:Microsoft.Practices.Prism.StoreApps"
     x:Class="SynoDL8.Views.TaskView"
-    mc:Ignorable="d" Height="100" Width="500"
+    mc:Ignorable="d" d:DesignHeight="100" d:DesignWidth="300"
     sdl8:StateHelper.State="{Binding Path=VisualState}">
 
     <Grid x:Name="grid1">

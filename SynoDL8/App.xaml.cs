@@ -69,8 +69,17 @@ namespace SynoDL8
 
         protected override Task OnLaunchApplication(LaunchActivatedEventArgs args)
         {
-            NavigationService.Navigate("Login", null);
-            return Task.FromResult<object>(null);
+            switch(args.Kind)
+            {
+                case ActivationKind.Protocol:
+                    NavigationService.Navigate("Main", args.Arguments);
+                    return Task.FromResult<object>(null);
+                case ActivationKind.Launch:
+                    NavigationService.Navigate("Login", null);
+                    return Task.FromResult<object>(null);
+                default:
+                    throw new ArgumentException("Unexpected activation kind");
+            }
         }
     }
 }
