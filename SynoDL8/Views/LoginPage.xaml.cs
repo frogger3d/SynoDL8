@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using Microsoft.Practices.Prism.StoreApps;
+using ReactiveUI;
 using SynoDL8.ViewModels;
 using System;
 using System.Collections.Generic;

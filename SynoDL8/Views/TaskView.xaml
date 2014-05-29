@@ -5,9 +5,10 @@
     xmlns:sdl8="using:SynoDL8"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:Interactivity="using:Microsoft.Xaml.Interactivity" xmlns:Core="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:Core="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:prism="using:Microsoft.Practices.Prism.StoreApps"
     x:Class="SynoDL8.Views.TaskView"
-    d:DataContext="{Binding Task, Source={StaticResource Locator}}"
     mc:Ignorable="d" Height="100" Width="500"
     sdl8:StateHelper.State="{Binding Path=VisualState}">
 
@@ -106,9 +107,9 @@
 				</StackPanel>
         
 				<StackPanel x:Name="stackPanel" Grid.Column="1" Height="90" VerticalAlignment="Top" Orientation="Horizontal" HorizontalAlignment="Right">
-					<Button x:Name="playButton" Style="{StaticResource PlayAppBarButtonStyle}" Command="{Binding PlayCommand}" Height="90"/>
-                    <Button x:Name="pauseButton" Style="{StaticResource PauseAppBarButtonStyle}" Command="{Binding PauseCommand}" Height="90"/>
-                    <Button x:Name="deleteButton" Style="{StaticResource DeleteAppBarButtonStyle}" Command="{Binding DeleteCommand}" Height="90"/>
+                    <AppBarButton x:Name="playButton" Icon="Play" Command="{Binding PlayCommand}" Height="90"/>
+                    <AppBarButton x:Name="pauseButton" Icon="Pause" Command="{Binding PauseCommand}" Height="90"/>
+                    <AppBarButton x:Name="deleteButton" Icon="Delete" Command="{Binding DeleteCommand}" Height="90"/>
                 </StackPanel>
 
                 <ProgressBar Value="{Binding Progress}" VerticalAlignment="Bottom" Height="2" Minimum="0" Maximum="1"

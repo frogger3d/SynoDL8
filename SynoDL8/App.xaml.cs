@@ -23,6 +23,7 @@ using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using Autofac;
 using Microsoft.Practices.Prism.StoreApps;
+using SynoDL8.Model;
 
 // The Split App template is documented at http://go.microsoft.com/fwlink/?LinkId=234228
 
@@ -64,38 +65,22 @@ namespace SynoDL8
             this.Suspending += OnSuspending;
         }
 
-        protected override void OnWindowCreated(WindowCreatedEventArgs args)
-        {
-            base.OnWindowCreated(args);
-
-            SettingsPane.GetForCurrentView().CommandsRequested += HandleCommandsRequested;
-        }
-
-        /// <summary>
-        /// Handles the <c>SettingsPane.CommandsRequested</c> event.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="args">The <see cref="SettingsPaneCommandsRequestedEventArgs" /> instance containing the event data.</param>
-        private void HandleCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
-        {
-            var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
-            //SettingsCommand updateCommand = new SettingsCommand("settings", loader.GetString("settings"), (handler) =>
-            //{
-            //    SynoSettingsFlyout sf = new SynoSettingsFlyout();
-            //    sf.Show();
-            //});
-
-            //args.Request.ApplicationCommands.Add(updateCommand);
-        }
-
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used when the application is launched to open a specific file, to display
         /// search results, and so forth.
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
-        protected override async void OnLaunched(LaunchActivatedEventArgs args)
+        protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
+
+#if DEBUG
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                this.DebugSettings.EnableFrameRateCounter = true;
+            }
+#endif
+
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -108,7 +93,7 @@ namespace SynoDL8
                 //Associate the frame with a SuspensionManager key                                
                 SuspensionManager.RegisterFrame(rootFrame, "AppFrame");
 
-                if (args.PreviousExecutionState == ApplicationExecutionState.Terminated)
+                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
                     // Restore the saved session state only when appropriate
                     try
@@ -130,10 +115,7 @@ namespace SynoDL8
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                if (!rootFrame.Navigate(typeof(LoginPage)))
-                {
-                    throw new Exception("Failed to create initial page");
-                }
+                rootFrame.Navigate(typeof(LoginPage), e.Arguments);
             }
             // Ensure the current window is active
             Window.Current.Activate();

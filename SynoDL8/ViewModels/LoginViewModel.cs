@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using Microsoft.Practices.Prism.StoreApps.Interfaces;
+using ReactiveUI;
 using SynoDL8.Model;
 using SynoDL8.Views;
 using System;
@@ -21,7 +22,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace SynoDL8.ViewModels
 {
-    public class LoginViewModel : ReactiveObject, ILoginViewModel
+    public class LoginViewModel : ReactiveObject, ILoginViewModel, INavigationAware
     {
         private readonly IConfigurationService ConfigurationService;
         private readonly IDataModel DataModel;
@@ -145,6 +146,16 @@ namespace SynoDL8.ViewModels
 
             this.ConfigurationService.SaveConfiguration(this.Credentials);
             return true;
+        }
+
+        public void OnNavigatedFrom(Dictionary<string, object> viewModelState, bool suspending)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void OnNavigatedTo(object navigationParameter, Windows.UI.Xaml.Navigation.NavigationMode navigationMode, Dictionary<string, object> viewModelState)
+        {
+            throw new NotImplementedException();
         }
     }
 }
