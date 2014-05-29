@@ -1,6 +1,6 @@
 ﻿using ReactiveUI;
 using SynoDL8.Model;
-using SynoDL8.View;
+using SynoDL8.Views;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,13 +12,14 @@ using System.Net.Http;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace SynoDL8.ViewModel
+namespace SynoDL8.ViewModels
 {
     public class LoginViewModel : ReactiveObject, ILoginViewModel
     {
@@ -65,7 +66,7 @@ namespace SynoDL8.ViewModel
                                     }
                                 });
 
-            var busyObservable = this.SigninCommand.IsExecuting;
+            var busyObservable = this.SigninCommand.IsExecuting.StartWith(false);
             this.busyV = busyObservable.Select(b => b ? Visibility.Visible : Visibility.Collapsed)
                                        .ToProperty(this, v => v.BusyV);
             this.available= busyObservable.Select(b => !b)
@@ -116,7 +117,9 @@ namespace SynoDL8.ViewModel
                 UserName = this.Credentials.User
             };
             this.ConfigurationService.SaveConfiguration(configuration);
-            
+
+            this.SigninError = null;
+
             // TODO this is an ugly construction..
             bool result;
             try
@@ -126,10 +129,26 @@ namespace SynoDL8.ViewModel
             catch (HttpRequestException e)
             {
                 var inner = e.InnerException as WebException;
-                if(inner != null)
+                if (inner != null)
                 {
-                    this.SigninError = "Sign in error: " + inner.Status;
+                    this.SigninError = inner.Message;
                 }
+                else
+                {
+                    this.SigninError = e.Message;
+                }
+
+                return false;
+            }
+            catch(TimeoutException)
+            {
+                this.SigninError = "Timeout trying to connect";
+
+                return false;
+            }
+            catch(VerificationException)
+            {
+                this.SigninError = "Wrong credentials";
 
                 return false;
             }

@@ -80,6 +80,8 @@ namespace SynoDL8.Model
                         return new ValidationResult("Host name should not contain a path or qeury");
                     }
                 }
+
+                isValid = true;
             }
             catch(Exception e)
             {

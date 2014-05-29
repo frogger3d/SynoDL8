@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using SynoDL8.Model;
-using SynoDL8.ViewModel;
+using SynoDL8.ViewModels;
+using SynoDL8.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,8 @@ namespace SynoDL8
         protected override void Load(ContainerBuilder builder)
         {
             bool isInDesignMode = Windows.ApplicationModel.DesignMode.DesignModeEnabled;
+
+            // Register models and viewmodels
             if (isInDesignMode)
             {
                 builder.RegisterType<DesignDataModel>().As<IDataModel>();

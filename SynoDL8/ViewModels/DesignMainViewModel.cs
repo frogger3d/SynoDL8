@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 
-namespace SynoDL8.ViewModel
+namespace SynoDL8.ViewModels
 {
     class DesignMainViewModel: IMainViewModel
     {

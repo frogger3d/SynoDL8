@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Popups;
 
-namespace SynoDL8.ViewModel
+namespace SynoDL8.ViewModels
 {
     public class DownloadTaskViewModel : ReactiveObject
     {

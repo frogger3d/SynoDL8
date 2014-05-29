@@ -8,6 +8,7 @@
     using System.Net;
     using System.Net.Http;
     using System.Reactive.Linq;
+    using System.Security;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -58,10 +59,15 @@
 
         public async Task<bool> LoginAsync()
         {
-            return await Observable.FromAsync(() => this.GetAsync(string.Format(LoginQuery, this.host, this.user, this.password)))
-                                   .Select(r => SynologyResponse.FromJason(r, SynologyResponse.GetAuthError).Success)
-                                   .Timeout(TimeSpan.FromSeconds(3))
-                                   .Retry(3);
+            var re = await Observable.FromAsync(() => this.GetAsync(string.Format(LoginQuery, this.host, this.user, this.password)))
+                                     .Select(r => SynologyResponse.FromJason(r, SynologyResponse.GetAuthError))
+                                     .Timeout(TimeSpan.FromSeconds(5))
+                                     .Retry(3);
+            if (!re.Success)
+            {
+                throw new VerificationException(re.Error);
+            }
+            return true;
         }
 
         public Task<bool> LogoutAsync()

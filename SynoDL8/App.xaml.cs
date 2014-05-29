@@ -1,7 +1,6 @@
-﻿using ReactiveUI;
-using SynoDL8.Common;
-using SynoDL8.View;
-using SynoDL8.ViewModel;
+﻿using SynoDL8.Common;
+using SynoDL8.Views;
+using SynoDL8.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,6 +21,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+using Autofac;
+using Microsoft.Practices.Prism.StoreApps;
 
 // The Split App template is documented at http://go.microsoft.com/fwlink/?LinkId=234228
 
@@ -32,6 +33,8 @@ namespace SynoDL8
     /// </summary>
     sealed partial class App : Application
     {
+        private readonly IContainer Container;
+            
         /// <summary>
         /// Initializes the singleton Application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -40,7 +43,23 @@ namespace SynoDL8
         {
             this.InitializeComponent();
 
-            RxApp.MutableResolver.Register(() => new LoginPage(), typeof(IViewFor<LoginViewModel>));
+            ContainerBuilder builder = new ContainerBuilder();
+            builder.RegisterModule(new SynoDownloadModule());
+            this.Container = builder.Build();
+
+            ViewModelLocator.SetDefaultViewTypeToViewModelTypeResolver(viewtype =>
+                {
+                    if (viewtype == typeof(MainPage))
+                        return typeof(IMainViewModel);
+                    if (viewtype == typeof(LoginPage))
+                        return typeof(ILoginViewModel);
+                    return null;
+                });
+
+            ViewModelLocator.SetDefaultViewModelFactory(vmtype =>
+                {
+                    return this.Container.Resolve(vmtype);
+                });
 
             this.Suspending += OnSuspending;
         }
@@ -139,8 +158,8 @@ namespace SynoDL8
             if (args.Kind == ActivationKind.Protocol)
             {
                 ProtocolActivatedEventArgs protocolArgs = (ProtocolActivatedEventArgs)args;
-                var locator = (ViewModelLocator)this.Resources["Locator"];
-                locator.Main.CreateCommand.Execute(protocolArgs.Uri);
+                throw new NotImplementedException();
+                // Browse to main page and start download
             }
         }
     }

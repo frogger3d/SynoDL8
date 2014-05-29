@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SynoDL8.Model;
-using SynoDL8.ViewModel;
+using SynoDL8.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,7 +26,7 @@ using Windows.UI.Xaml.Navigation;
 
 // The Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234233
 
-namespace SynoDL8.View
+namespace SynoDL8.Views
 {
     /// <summary>
     /// A page that displays a collection of item previews.  In the Split Application this page

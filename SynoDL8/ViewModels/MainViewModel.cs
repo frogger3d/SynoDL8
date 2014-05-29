@@ -1,9 +1,8 @@
-﻿namespace SynoDL8.ViewModel
+﻿namespace SynoDL8.ViewModels
 {
     using ReactiveUI;
     using ReactiveUI.Xaml;
     using SynoDL8.Model;
-    using SynoDL8.ViewModel;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;

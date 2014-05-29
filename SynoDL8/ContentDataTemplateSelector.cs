@@ -2,7 +2,7 @@
 namespace SynoDL8
 {
     using SynoDL8.Model;
-    using SynoDL8.ViewModel;
+    using SynoDL8.ViewModels;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;

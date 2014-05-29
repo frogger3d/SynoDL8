@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 
-namespace SynoDL8.ViewModel
+namespace SynoDL8.ViewModels
 {
     public interface ILoginViewModel
     {
