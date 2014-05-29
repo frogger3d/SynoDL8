@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SynoDL8.DataModel
+namespace SynoDL8.Model
 {
     public interface IDataModel
     {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 
-namespace SynoDL8.DataModel
+namespace SynoDL8.Model
 {
     public class ConfigurationService : IConfigurationService
     {

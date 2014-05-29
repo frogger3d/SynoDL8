@@ -13,7 +13,7 @@
 */
 
 using Autofac;
-using SynoDL8.DataModel;
+using SynoDL8.Model;
 
 namespace SynoDL8.ViewModel
 {

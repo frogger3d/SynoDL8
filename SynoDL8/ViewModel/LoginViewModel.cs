@@ -1,5 +1,5 @@
 ﻿using ReactiveUI;
-using SynoDL8.DataModel;
+using SynoDL8.Model;
 using SynoDL8.View;
 using System;
 using System.Collections;

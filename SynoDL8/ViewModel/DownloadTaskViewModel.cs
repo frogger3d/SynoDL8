@@ -1,6 +1,6 @@
 ﻿using ReactiveUI;
 using ReactiveUI.Xaml;
-using SynoDL8.DataModel;
+using SynoDL8.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;

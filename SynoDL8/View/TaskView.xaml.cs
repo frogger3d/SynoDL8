@@ -1,4 +1,4 @@
-﻿using SynoDL8.DataModel;
+﻿using SynoDL8.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;

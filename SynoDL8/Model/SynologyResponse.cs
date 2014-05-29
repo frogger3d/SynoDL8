@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SynoDL8.DataModel
+namespace SynoDL8.Model
 {
     public static class SynologyResponseMixins
     {

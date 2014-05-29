@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SynoDL8.DataModel;
+using SynoDL8.Model;
 using SynoDL8.ViewModel;
 using System;
 using System.Collections.Generic;

@@ -111,19 +111,19 @@
     </Compile>
     <Compile Include="ArgumentValidation.cs" />
     <Compile Include="ContentDataTemplateSelector.cs" />
-    <Compile Include="DataModel\IConfigurationService.cs" />
-    <Compile Include="DataModel\ConfigurationService.cs" />
-    <Compile Include="DataModel\Configuration.cs" />
-    <Compile Include="DataModel\DesignDataModel.cs" />
-    <Compile Include="DataModel\DownloadTask.cs" />
-    <Compile Include="DataModel\Statistics.cs" />
-    <Compile Include="DataModel\SynologyResponse.cs" />
+    <Compile Include="Model\IConfigurationService.cs" />
+    <Compile Include="Model\ConfigurationService.cs" />
+    <Compile Include="Model\Configuration.cs" />
+    <Compile Include="Model\DesignDataModel.cs" />
+    <Compile Include="Model\DownloadTask.cs" />
+    <Compile Include="Model\Statistics.cs" />
+    <Compile Include="Model\SynologyResponse.cs" />
     <Compile Include="StateHelper.cs" />
     <Compile Include="ViewModel\DesignMainViewModel.cs" />
     <Compile Include="ViewModel\ILoginViewModel.cs" />
     <Compile Include="ViewModel\LoginViewModel.cs" />
-    <Compile Include="DataModel\SynologyDataModel.cs" />
-    <Compile Include="DataModel\IDataModel.cs" />
+    <Compile Include="Model\SynologyDataModel.cs" />
+    <Compile Include="Model\IDataModel.cs" />
     <Compile Include="SynoDownloadModule.cs" />
     <Compile Include="ViewModel\IMainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
@@ -190,6 +190,9 @@
   <ItemGroup>
     <Reference Include="Autofac">
       <HintPath>..\packages\Autofac.3.3.1\lib\portable-win+net40+sl50+wp8\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Prism.StoreApps">
+      <HintPath>..\packages\Prism.StoreApps.1.1.0\lib\windows8\Microsoft.Practices.Prism.StoreApps.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

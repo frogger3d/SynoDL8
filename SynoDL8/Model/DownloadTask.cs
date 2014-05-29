@@ -1,4 +1,4 @@
-﻿namespace SynoDL8.DataModel
+﻿namespace SynoDL8.Model
 {
     using Newtonsoft.Json.Linq;
     using ReactiveUI;
