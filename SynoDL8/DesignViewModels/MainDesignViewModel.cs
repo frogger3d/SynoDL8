@@ -25,6 +25,8 @@
         {
             this.UploadSpeed = "Upload 5 KBps";
             this.DownloadSpeed = "Download 50 KBps";
+            this.HostInfo = @"Geoffrey @ http://mydiskstation:5000";
+            this.Message = "Dumb message";
         }
         public ReactiveCommand VersionsCommand { get; set; }
 
@@ -33,6 +35,8 @@
         public ReactiveCommand ListCommand { get; set; }
 
         public ReactiveCommand CreateCommand { get; set; }
+
+        public string HostInfo { get; set; }
 
         public string Url { get; set; }
 

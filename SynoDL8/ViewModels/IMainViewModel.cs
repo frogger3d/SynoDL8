@@ -21,7 +21,8 @@
         ReactiveCommand ListCommand { get; }
         ReactiveCommand CreateCommand { get; }
 
-        string Url { get;set;}
+        string HostInfo { get; }
+        string Url { get; set; }
         string Message { get; }
         ReactiveList<DownloadTaskViewModel> Content { get; }
 

@@ -50,15 +50,16 @@
                             Style="{StaticResource NavigationBackButtonNormalStyle}"/>
                     <TextBlock x:Name="pageTitle" Grid.Column="1" x:Uid="applicationTitle" Text="SynoDL8"
                                IsHitTestVisible="false" Style="{StaticResource HeaderTextBlockStyle}"/>
-                    <TextBlock Grid.Column="1" VerticalAlignment="Bottom" Text="{Binding Message}"/>
                 </Grid>
             </Hub.Header>
 
             <HubSection Background="DarkOrange" MinWidth="400">
                 <DataTemplate>
                     <StackPanel>
+                        <TextBlock Text="{Binding HostInfo}" Style="{StaticResource SubheaderTextBlockStyle}" Margin="0,0,0,20"/>
                         <TextBlock Text="{Binding Path=DownloadSpeed}" Foreground="LightGreen" Style="{StaticResource SubheaderTextBlockStyle}"/>
-                        <TextBlock Text="{Binding Path=UploadSpeed}" Foreground="LightGoldenrodYellow" Style="{StaticResource SubheaderTextBlockStyle}"/>
+                        <TextBlock Text="{Binding Path=UploadSpeed}" Foreground="LightGoldenrodYellow" Style="{StaticResource SubheaderTextBlockStyle}" Margin="0,0,0,20"/>
+                        <TextBlock Text="{Binding Message}" Style="{StaticResource BaseTextBlockStyle}"/>
                     </StackPanel>
                 </DataTemplate>
             </HubSection>

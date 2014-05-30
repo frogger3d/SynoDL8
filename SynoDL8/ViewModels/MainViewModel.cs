@@ -23,6 +23,7 @@
         private readonly ISynologyService SynologyService;
         private readonly ObservableAsPropertyHelper<string> uploadSpeed;
         private readonly ObservableAsPropertyHelper<string> downloadSpeed;
+        private readonly Credentials Credentials;
 
         private string message;
         private ReactiveList<DownloadTaskViewModel> content;
@@ -31,9 +32,11 @@
         private IDisposable listSubscription;
         private IDisposable statisticsSubscription;
 
-        public MainViewModel(ISynologyService synologyService)
+        public MainViewModel(ISynologyService synologyService, IConfigurationService configurationService)
         {
-            this.SynologyService = synologyService;
+            this.SynologyService = synologyService.ThrowIfNull("synologyService");
+            this.Credentials = configurationService.ThrowIfNull("configurationService").GetLastCredentials();
+            this.HostInfo = string.Format("{0} @ {1}", this.Credentials.User, this.Credentials.Hostname);
 
             this.Content = new ReactiveList<DownloadTaskViewModel>();
 
@@ -70,6 +73,8 @@
 
             this.statisticsSubscription = statistics.Connect();
         }
+
+        public string HostInfo { get; private set; }
 
         private async void DisplayDialog(string v)
         {
