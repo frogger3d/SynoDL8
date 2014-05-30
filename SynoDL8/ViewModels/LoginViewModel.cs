@@ -49,10 +49,8 @@ namespace SynoDL8.ViewModels
             this.ConfigurationService = configurationService;
             this.DataModel = dataModel;
 
-            this.Credentials = new Credentials();
+            this.Credentials = this.ConfigurationService.GetConfiguration();
             this.Credentials.IsValidationEnabled = true;
-
-            var configuration = this.ConfigurationService.GetConfiguration();
 
             var hasErrorsObservable = Observable.FromEventPattern<DataErrorsChangedEventArgs>(h => this.Credentials.ErrorsChanged += h, h => this.Credentials.ErrorsChanged -= h)
                                                 .Select(e => this.Credentials.GetAllErrors().Any());
