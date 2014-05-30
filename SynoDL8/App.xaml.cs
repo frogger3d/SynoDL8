@@ -81,16 +81,66 @@ namespace SynoDL8
             });
         }
 
-        protected override Task OnLaunchApplication(LaunchActivatedEventArgs args)
+        protected override async void OnActivated(IActivatedEventArgs args)
         {
-            switch(args.Kind)
+            switch (args.Kind)
             {
                 case ActivationKind.Protocol:
-                    NavigationService.Navigate("Main", args.Arguments);
-                    return Task.FromResult<object>(null);
+                    ProtocolActivatedEventArgs protocolArgs = (ProtocolActivatedEventArgs)args;
+                    var synologyService = this.container.Resolve<ISynologyService>();
+                    var configurationService = this.container.Resolve<IConfigurationService>();
+                    var credentials = configurationService.GetLastCredentials();
+                    if (credentials != null)
+                    {
+                        await synologyService.LoginAsync(credentials);
+                        if (synologyService.IsSignedIn)
+                        {
+                            await synologyService.CreateTaskAsync(protocolArgs.Uri.ToString());
+                            if (args.PreviousExecutionState == ApplicationExecutionState.NotRunning)
+                            {
+                                NavigationService.Navigate("Main", "Download started");
+                            }
+
+                            return;
+                        }
+                    }
+
+                    if (args.PreviousExecutionState == ApplicationExecutionState.NotRunning)
+                    {
+                        NavigationService.Navigate("Login", null);
+                    }
+
+                    return;
+            }
+
+        }
+
+        protected override async Task OnLaunchApplication(LaunchActivatedEventArgs args)
+        {
+            switch (args.Kind)
+            {
+                case ActivationKind.Protocol:
+                    var synologyService = this.container.Resolve<ISynologyService>();
+                    var configurationService = this.container.Resolve<IConfigurationService>();
+                    var credentials = configurationService.GetLastCredentials();
+                    if (credentials != null)
+                    {
+                        await synologyService.LoginAsync(credentials);
+                        if (synologyService.IsSignedIn)
+                        {
+                            await synologyService.CreateTaskAsync(args.Arguments);
+                            NavigationService.Navigate("Main", null);
+                            return;
+                        }
+                    }
+
+                    NavigationService.Navigate("Login", null);
+                    return;
+
                 case ActivationKind.Launch:
                     NavigationService.Navigate("Login", null);
-                    return Task.FromResult<object>(null);
+                    return;
+
                 default:
                     throw new ArgumentException("Unexpected activation kind");
             }

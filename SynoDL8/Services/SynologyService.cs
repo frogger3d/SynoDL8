@@ -60,11 +60,22 @@
             return true;
         }
 
-        public Task<bool> LogoutAsync()
+        public bool IsSignedIn
+        {
+            get { return this.credentials != null; }
+        }
+
+        public async Task<bool> LogoutAsync()
         {
             CheckSignedin();
-            return this.GetAsync(string.Format(LogoutQuery, this.credentials.Hostname))
-                       .IsSuccess(SynologyResponse.GetAuthError);
+            var success = await this.GetAsync(string.Format(LogoutQuery, this.credentials.Hostname))
+                                    .IsSuccess(SynologyResponse.GetAuthError);
+            if (success)
+            {
+                this.credentials = null;
+                return true;
+            }
+            return false;
         }
 
         public async Task<string> GetVersionsAsync()
@@ -143,7 +154,7 @@
 
         private void CheckSignedin()
         {
-            if(this.credentials == null)
+            if (this.credentials == null)
             {
                 throw new InvalidOperationException("Not signed in");
             }

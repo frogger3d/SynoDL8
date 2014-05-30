@@ -1,7 +1,9 @@
 ﻿namespace SynoDL8.ViewModels
 {
+    using Microsoft.Practices.Prism.StoreApps.Interfaces;
     using ReactiveUI;
     using ReactiveUI.Xaml;
+    using ReactiveUI.Mobile;
     using SynoDL8.Model;
     using SynoDL8.Services;
     using System;
@@ -17,13 +19,16 @@
     using System.Windows.Input;
     using Windows.UI.Popups;
     using Windows.UI.Xaml;
+    using Windows.UI.Xaml.Navigation;
 
-    public class MainViewModel : ReactiveObject
+    public class MainViewModel : ReactiveObject, INavigationAware, IDisposable
     {
         private readonly ISynologyService SynologyService;
         private readonly ObservableAsPropertyHelper<string> uploadSpeed;
         private readonly ObservableAsPropertyHelper<string> downloadSpeed;
         private readonly Credentials Credentials;
+        private readonly IConnectableObservable<Statistics> statisticsObservable;
+        private readonly IConnectableObservable<bool> listObservable;
 
         private string message;
         private ReactiveList<DownloadTaskViewModel> content;
@@ -55,23 +60,21 @@
             this.ListCommand.RegisterAsyncTask(_ => this.List()).Subscribe();
             this.CreateCommand.RegisterAsyncTask(url => this.Create(url)).Subscribe();
 
-            this.listSubscription = Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(4))
-                                              .ObserveOnDispatcher()
-                                              .Select(t => Observable.FromAsync(this.List))
-                                              .Switch()
-                                              .Subscribe();
+            this.listObservable = Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(4))
+                                            .ObserveOnDispatcher()
+                                            .Select(t => Observable.FromAsync(this.List))
+                                            .Switch()
+                                            .Publish();
 
-            var statistics = Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(4))
-                                       .Select(_ => Observable.FromAsync(this.SynologyService.GetStatisticsAsync))
-                                       .Switch()                                       
-                                       .Publish();
+            this.statisticsObservable = Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(4))
+                                                  .Select(_ => Observable.FromAsync(this.SynologyService.GetStatisticsAsync))
+                                                  .Switch()                                       
+                                                  .Publish();
 
-            this.uploadSpeed = statistics.Select(s => (s == null) ? "" : string.Format("Upload: {0:0} KBps", s.DownloadSpeed / 1000.0))
-                                           .ToProperty(this, v => v.UploadSpeed);
-            this.downloadSpeed = statistics.Select(s => (s == null) ? "" : string.Format("Download: {0:0} KBps", s.DownloadSpeed / 1000.0))
-                                           .ToProperty(this, v => v.DownloadSpeed);
-
-            this.statisticsSubscription = statistics.Connect();
+            this.uploadSpeed = statisticsObservable.Select(s => (s == null) ? "" : string.Format("Upload: {0:0} KBps", s.UploadSpeed / 1000.0))
+                                                   .ToProperty(this, v => v.UploadSpeed);
+            this.downloadSpeed = statisticsObservable.Select(s => (s == null) ? "" : string.Format("Download: {0:0} KBps", s.DownloadSpeed / 1000.0))
+                                                     .ToProperty(this, v => v.DownloadSpeed);
         }
 
         public string HostInfo { get; private set; }
@@ -179,6 +182,29 @@
         public string DownloadSpeed
         {
             get { return this.downloadSpeed.Value; }
+        }
+
+        public void Dispose()
+        {
+            this.statisticsSubscription.Dispose();
+            this.listSubscription.Dispose();
+        }
+
+        public void OnNavigatedFrom(Dictionary<string, object> viewModelState, bool suspending)
+        {
+            this.Dispose();
+        }
+
+        public void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)
+        {
+            string message = navigationParameter as string;
+            if (message != null)
+            {
+                this.Message = message;
+            }
+
+            this.statisticsSubscription = this.statisticsObservable.Connect();
+            this.listSubscription = this.listObservable.Connect();
         }
     }
 }

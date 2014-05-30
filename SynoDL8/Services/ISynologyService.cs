@@ -23,5 +23,7 @@ namespace SynoDL8.Services
         Task<bool> DeleteTaskAsync(string taskid);
 
         Task<IEnumerable<DownloadTask>> List();
+
+        bool IsSignedIn { get; }
     }
 }
