@@ -9,14 +9,31 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:prism="using:Microsoft.Practices.Prism.StoreApps"
+    xmlns:designviewmodels="using:SynoDL8.DesignViewModels"
+    mc:Ignorable="d"
     prism:ViewModelLocator.AutoWireViewModel="True"
-    mc:Ignorable="d">
+    d:DataContext="{d:DesignInstance designviewmodels:MainDesignViewModel, IsDesignTimeCreatable=True}">
 
 	<Page.BottomAppBar>
         <CommandBar>
             <AppBarButton Label="Refresh" Icon="Refresh" Command="{Binding Path=ListCommand}"/>
             <AppBarButton Label="Versions" Command="{Binding VersionsCommand}" />
             <AppBarButton Label="Info" Command="{Binding InfoCommand}" />
+            
+            <CommandBar.SecondaryCommands>
+                <AppBarButton Label="Download" Icon="Download">
+                    <AppBarButton.Flyout>
+                        <Flyout FlyoutPresenterStyle="{StaticResource FlyoutStyle}">
+                            <Grid x:Name="PopupPanel" Background="{StaticResource AppBarBackgroundThemeBrush}" Opacity=".9">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBox Text="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MinWidth="300"/>
+                                    <Button Command="{Binding CreateCommand}" Content="Download" VerticalAlignment="Stretch"/>
+                                </StackPanel>
+                            </Grid>
+                        </Flyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+            </CommandBar.SecondaryCommands>
         </CommandBar>
     </Page.BottomAppBar>
 
@@ -36,16 +53,13 @@
                     <TextBlock Grid.Column="1" VerticalAlignment="Bottom" Text="{Binding Message}"/>
                 </Grid>
             </Hub.Header>
-            
-            <HubSection Header="Actions">
-                <DataTemplate>
-                    <ItemsControl>
-                        <TextBox Text="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Button Command="{Binding CreateCommand}" Content="Create"/>
 
+            <HubSection Background="DarkOrange" MinWidth="400">
+                <DataTemplate>
+                    <StackPanel>
                         <TextBlock Text="{Binding Path=DownloadSpeed}" Foreground="LightGreen" Style="{StaticResource SubheaderTextBlockStyle}"/>
-                        <TextBlock Text="{Binding Path=UploadSpeed}" Foreground="Red" Style="{StaticResource SubheaderTextBlockStyle}"/>
-                    </ItemsControl>
+                        <TextBlock Text="{Binding Path=UploadSpeed}" Foreground="LightGoldenrodYellow" Style="{StaticResource SubheaderTextBlockStyle}"/>
+                    </StackPanel>
                 </DataTemplate>
             </HubSection>
             <HubSection Header="Downloads">

@@ -115,6 +115,7 @@
     <Compile Include="ContentDataTemplateSelector.cs" />
     <Compile Include="Converters\FirstErrorConverter.cs" />
     <Compile Include="Converters\TextToHeaderVisibilityConverter.cs" />
+    <Compile Include="DesignViewModels\MainDesignViewModel.cs" />
     <Compile Include="Model\Credentials.cs" />
     <Compile Include="Services\IConfigurationService.cs" />
     <Compile Include="Services\ConfigurationService.cs" />
