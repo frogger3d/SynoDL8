@@ -29,13 +29,15 @@
         private readonly Credentials Credentials;
         private readonly IConnectableObservable<Statistics> statisticsObservable;
         private readonly IConnectableObservable<bool> listObservable;
+        private readonly ObservableAsPropertyHelper<bool> hasDownloads, hasFinished;
 
         private string message;
-        private ReactiveList<DownloadTaskViewModel> content;
         private string url;
 
         private IDisposable listSubscription;
         private IDisposable statisticsSubscription;
+
+        private ReactiveList<DownloadTaskViewModel> allTasks;
 
         public MainViewModel(ISynologyService synologyService, IConfigurationService configurationService)
         {
@@ -43,7 +45,7 @@
             this.Credentials = configurationService.ThrowIfNull("configurationService").GetLastCredentials();
             this.HostInfo = string.Format("{0} @ {1}", this.Credentials.User, this.Credentials.Hostname);
 
-            this.Content = new ReactiveList<DownloadTaskViewModel>();
+            this.allTasks = new ReactiveList<DownloadTaskViewModel>();
 
             var available = new BehaviorSubject<bool>(true);
 
@@ -66,6 +68,16 @@
                                             .Switch()
                                             .Publish();
 
+            this.DownloadingList = this.allTasks.CreateDerivedCollection(t => t, filter: t => t.IsDownloading);
+            this.hasDownloads = this.DownloadingList
+                                    .CountChanged
+                                    .Select(c => c > 0)
+                                    .ToProperty(this, v => v.HasDowloads);
+            this.FinishedList = this.allTasks.CreateDerivedCollection(t => t, filter: t => !t.IsDownloading);
+            this.hasFinished = this.DownloadingList
+                                   .CountChanged
+                                   .Select(c => c > 0)
+                                   .ToProperty(this, v => v.HasFinished);
             this.statisticsObservable = Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(4))
                                                   .Select(_ => Observable.FromAsync(this.SynologyService.GetStatisticsAsync))
                                                   .Switch()                                       
@@ -75,6 +87,8 @@
                                                    .ToProperty(this, v => v.UploadSpeed);
             this.downloadSpeed = statisticsObservable.Select(s => (s == null) ? "" : string.Format("Download: {0:0} KBps", s.DownloadSpeed / 1000.0))
                                                      .ToProperty(this, v => v.DownloadSpeed);
+
+            this.Sections = new ReactiveList<string>() { "a", "b", "c", };
         }
 
         public string HostInfo { get; private set; }
@@ -89,6 +103,13 @@
         public ReactiveCommand ListCommand { get; private set; }
         public ReactiveCommand CreateCommand { get; private set; }
 
+        public IReactiveDerivedList<DownloadTaskViewModel> DownloadingList { get; private set; }
+        public bool HasDowloads { get { return this.hasDownloads.Value; } }
+        public IReactiveDerivedList<DownloadTaskViewModel> FinishedList { get; private set; }
+        public bool HasFinished { get { return this.hasFinished.Value; } }
+
+        public ReactiveList<string> Sections { get; set; }
+
         public string Url
         {
             get { return this.url; }
@@ -99,12 +120,6 @@
         {
             get { return this.message; }
             private set { this.RaiseAndSetIfChanged(ref message, value); }
-        }
-
-        public ReactiveList<DownloadTaskViewModel> Content
-        {
-            get { return this.content; }
-            private set { this.RaiseAndSetIfChanged(ref content, value); }
         }
 
         private async Task<string> Versions()
@@ -147,11 +162,29 @@
             string dialogMessage = null;
             try
             {
-                var response = await this.SynologyService.List();
-                using (this.Content.SuppressChangeNotifications())
+                var newTasks = await this.SynologyService.List();
+                using (this.allTasks.SuppressChangeNotifications())
                 {
-                    this.Content.Clear();
-                    this.Content.AddRange(response.Select(t => new DownloadTaskViewModel(this.SynologyService, t)));
+                    var removeIds = this.allTasks.Select(t => t.Task.Id).Except(newTasks.Select(t => t.Id));
+                    foreach(var id in removeIds)
+                    {
+                        var task = this.allTasks.Single(t => t.Task.Id == id);
+                        this.allTasks.Remove(task);
+                    }
+
+                    var updateIds = this.allTasks.Select(t => t.Task.Id).Intersect(newTasks.Select(t => t.Id));
+                    foreach(var id in updateIds)
+                    {
+                        var task = this.allTasks.Single(t => t.Task.Id == id);
+                        task.Task = newTasks.Single(t => t.Id == id);
+                    }
+
+                    var addIds = newTasks.Select(t => t.Id).Except(this.allTasks.Select(t => t.Task.Id));
+                    foreach(var id in addIds)
+                    {
+                        var task = newTasks.Single(t => t.Id == id);
+                        this.allTasks.Add(new DownloadTaskViewModel(this.SynologyService, task));
+                    }
                 }
             }
             catch (Exception e)

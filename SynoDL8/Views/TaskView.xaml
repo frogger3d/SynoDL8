@@ -102,8 +102,8 @@
 				</Grid.ColumnDefinitions>
 
 				<StackPanel Orientation="Vertical" MinWidth="500">
-					<TextBlock Text="{Binding Title}" Foreground="Black" Padding="5" FontWeight="SemiBold"/>
-					<TextBlock Text="{Binding Status}" Foreground="Black" Padding="5" FontWeight="SemiBold"/>
+					<TextBlock Text="{Binding Path=Title}" Foreground="Black" Padding="5" FontWeight="SemiBold"/>
+					<TextBlock Text="{Binding Path=Status}" Foreground="Black" Padding="5" FontWeight="SemiBold"/>
 				</StackPanel>
         
 				<StackPanel x:Name="stackPanel" Grid.Column="1" Height="90" VerticalAlignment="Top" Orientation="Horizontal" HorizontalAlignment="Right">

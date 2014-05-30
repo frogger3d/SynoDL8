@@ -113,6 +113,7 @@
     <Compile Include="Behaviors\Behavior.cs" />
     <Compile Include="Behaviors\HighlightFormFieldOnErrors.cs" />
     <Compile Include="ContentDataTemplateSelector.cs" />
+    <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\FirstErrorConverter.cs" />
     <Compile Include="Converters\TextToHeaderVisibilityConverter.cs" />
     <Compile Include="DesignViewModels\MainDesignViewModel.cs" />

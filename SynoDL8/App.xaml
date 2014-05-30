@@ -13,8 +13,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <converter:TextToHeaderVisibilityConverter x:Key="TextToHeaderVisibilityConverter"/>
-            
-            <!-- Application-specific resources -->
+            <converter:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 
             <DataTemplate x:Key="stringTemplate">
                 <TextBlock Text="{Binding}"/>

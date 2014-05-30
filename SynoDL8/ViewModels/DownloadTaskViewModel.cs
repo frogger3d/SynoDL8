@@ -17,48 +17,88 @@ namespace SynoDL8.ViewModels
 {
     public class DownloadTaskViewModel : ReactiveObject
     {
-        private ISynologyService SynologyService;
-        private DownloadTask Task;
+        private readonly ISynologyService SynologyService;
+        private readonly ObservableAsPropertyHelper<string> visualState;
+        private readonly ObservableAsPropertyHelper<bool> isDownloading;
+        private readonly BehaviorSubject<bool> AreAllAvailable;
 
         private bool busy;
-        private BehaviorSubject<bool> areAllAvailable;
+        private DownloadTask task;
 
         public DownloadTaskViewModel(ISynologyService synologyService, DownloadTask task)
         {
             this.SynologyService = synologyService.ThrowIfNull("synologyService");
             this.Task = task.ThrowIfNull("task");
 
-            areAllAvailable = new BehaviorSubject<bool>(true);
+            this.AreAllAvailable = new BehaviorSubject<bool>(true);
 
-            this.PauseCommand = new ReactiveCommand(areAllAvailable);
-            this.PlayCommand = new ReactiveCommand(areAllAvailable);
-            this.DeleteCommand = new ReactiveCommand(areAllAvailable);
+            this.PauseCommand = new ReactiveCommand(AreAllAvailable);
+            this.PlayCommand = new ReactiveCommand(AreAllAvailable);
+            this.DeleteCommand = new ReactiveCommand(AreAllAvailable);
 
             Observable.CombineLatest(PauseCommand.IsExecuting, PlayCommand.IsExecuting, (pa, pl) => !(pa || pl))
-                      .Subscribe(n => areAllAvailable.OnNext(n));
+                      .Subscribe(n => AreAllAvailable.OnNext(n));
 
             this.PlayCommand.RegisterAsyncTask(_ => this.SynologyService.ResumeTaskAsync(this.Task.Id)).Subscribe();
             this.PauseCommand.RegisterAsyncTask(_ => this.SynologyService.PauseTaskAsync(this.Task.Id)).Subscribe();
             this.DeleteCommand.RegisterAsyncTask(_ => this.SynologyService.DeleteTaskAsync(this.Task.Id)).Subscribe();
+
+            this.isDownloading = this.WhenAny(v => v.Task.Status, a => a)
+                                     .Select(v =>
+                                     {
+                                         switch (this.Task.Status)
+                                         {
+                                             case DownloadTask.status.downloading:
+                                             case DownloadTask.status.extracting:
+                                             case DownloadTask.status.filehosting_waiting:
+                                             case DownloadTask.status.finishing:
+                                             case DownloadTask.status.waiting:
+                                                 return true;
+
+                                             default:
+                                                 return false;
+                                         }
+                                     })
+                                     .ToProperty(this, v => v.IsDownloading);
+
+            this.visualState = this.WhenAny(v => v.Task.Status, a => a)
+                                     .Select(v =>
+                                     {
+                                         switch (this.Task.Status)
+                                         {
+                                             case DownloadTask.status.paused:
+                                                 return "Paused";
+                                             case DownloadTask.status.downloading:
+                                                 return "Downloading";
+                                             case DownloadTask.status.waiting: // cannot start because it is queued
+                                             case DownloadTask.status.finished:
+                                                 return "Finished";
+                                             default:
+                                                 return "Normal";
+                                         }
+                                     })
+                                     .ToProperty(this, v => v.VisualState);
+
+            this.title = this.WhenAny(v => v.Task.Title, a => a.Value)
+                             .ToProperty(this, v => v.Title);
+
+            this.status = this.WhenAny(v => v.Task.Status, a => a.Value.ToString())
+                              .ToProperty(this, v => v.Status);
+        }
+
+        ObservableAsPropertyHelper<string> title, status;
+        public string Title { get { return this.title.Value; } }
+        public string Status { get { return this.status.Value; } }
+
+        public DownloadTask Task
+        {
+            get { return this.task; }
+            set { this.RaiseAndSetIfChanged(ref this.task, value); }
         }
 
         public string VisualState
         {
-            get
-            {
-                switch (this.Task.Status)
-                {
-                    case DownloadTask.status.paused:
-                        return "Paused";
-                    case DownloadTask.status.downloading:
-                        return "Downloading";
-                    case DownloadTask.status.waiting: // cannot start because it is queued
-                    case DownloadTask.status.finished:
-                        return "Finished";
-                    default:
-                        return "Normal";
-                }
-            }
+            get { return this.visualState.Value; }
         }
 
         public bool Busy
@@ -75,9 +115,6 @@ namespace SynoDL8.ViewModels
         public ReactiveCommand PlayCommand { get; set; }
         public ReactiveCommand PauseCommand { get; set; }
         public ReactiveCommand DeleteCommand { get; set; }
-
-        public string Title { get { return this.Task.Title; } }
-        public DownloadTask.status Status { get { return this.Task.Status; } }
 
         private void Pause()
         {
@@ -115,6 +152,11 @@ namespace SynoDL8.ViewModels
                                   this.Busy = false;
                                   new MessageDialog("Could not resume due to error");
                               });
+        }
+
+        public bool IsDownloading
+        {
+            get { return this.isDownloading.Value; }
         }
     }
 }
