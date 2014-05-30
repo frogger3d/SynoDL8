@@ -18,7 +18,7 @@
     using Windows.UI.Popups;
     using Windows.UI.Xaml;
 
-    public class MainViewModel : ReactiveObject, IMainViewModel
+    public class MainViewModel : ReactiveObject
     {
         private readonly ISynologyService SynologyService;
         private readonly ObservableAsPropertyHelper<string> uploadSpeed;

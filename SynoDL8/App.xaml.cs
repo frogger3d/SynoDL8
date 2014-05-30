@@ -27,6 +27,7 @@ using SynoDL8.Model;
 using System.Threading.Tasks;
 using Microsoft.Practices.Prism.StoreApps.Interfaces;
 using SynoDL8.Services;
+using System.Globalization;
 
 // The Split App template is documented at http://go.microsoft.com/fwlink/?LinkId=234228
 
@@ -60,19 +61,18 @@ namespace SynoDL8
             builder.RegisterType<ConfigurationService>().As<IConfigurationService>().SingleInstance();
 
             // ViewModels
-            builder.RegisterType<MainViewModel>().As<IMainViewModel>();
-            builder.RegisterType<DownloadTaskViewModel>().As<DownloadTaskViewModel>();
-            builder.RegisterType<LoginViewModel>().As<ILoginViewModel>();
+            builder.RegisterType<MainViewModel>().AsSelf();
+            builder.RegisterType<DownloadTaskViewModel>().AsSelf();
+            builder.RegisterType<LoginViewModel>().AsSelf();
 
             this.container = builder.Build();
 
-            ViewModelLocator.SetDefaultViewTypeToViewModelTypeResolver(viewtype =>
+            ViewModelLocator.SetDefaultViewTypeToViewModelTypeResolver((viewType) =>
             {
-                if (viewtype == typeof(MainPage))
-                    return typeof(IMainViewModel);
-                if (viewtype == typeof(LoginPage))
-                    return typeof(ILoginViewModel);
-                return null;
+                var viewName = viewType.Name.EndsWith("Page") ? viewType.Name.Substring(0, viewType.Name.Length - 4) : viewType.Name;
+                var viewModelTypeName = string.Format(CultureInfo.InvariantCulture, "SynoDL8.ViewModels.{0}ViewModel", viewName);
+                var viewModelType = Type.GetType(viewModelTypeName);
+                return viewModelType;
             });
 
             ViewModelLocator.SetDefaultViewModelFactory(vmtype =>

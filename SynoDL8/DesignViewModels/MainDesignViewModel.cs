@@ -19,7 +19,7 @@
     using Windows.UI.Popups;
     using Windows.UI.Xaml;
 
-    public class MainDesignViewModel : IMainViewModel
+    public class MainDesignViewModel
     {
         public MainDesignViewModel()
         {
@@ -28,13 +28,6 @@
             this.HostInfo = @"Geoffrey @ http://mydiskstation:5000";
             this.Message = "Dumb message";
         }
-        public ReactiveCommand VersionsCommand { get; set; }
-
-        public ReactiveCommand InfoCommand { get; set; }
-
-        public ReactiveCommand ListCommand { get; set; }
-
-        public ReactiveCommand CreateCommand { get; set; }
 
         public string HostInfo { get; set; }
 

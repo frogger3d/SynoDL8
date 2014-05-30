@@ -25,7 +25,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace SynoDL8.ViewModels
 {
-    public class LoginViewModel : ReactiveObject, ILoginViewModel, INavigationAware
+    public class LoginViewModel : ReactiveObject, INavigationAware
     {
         private readonly IConfigurationService ConfigurationService;
         private readonly ISynologyService SynologyService;

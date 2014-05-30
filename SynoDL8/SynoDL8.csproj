@@ -123,11 +123,9 @@
     <Compile Include="Model\Statistics.cs" />
     <Compile Include="Model\SynologyResponse.cs" />
     <Compile Include="StateHelper.cs" />
-    <Compile Include="ViewModels\ILoginViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="Services\SynologyService.cs" />
     <Compile Include="Services\ISynologyService.cs" />
-    <Compile Include="ViewModels\IMainViewModel.cs" />
     <Compile Include="ViewModels\DownloadTaskViewModel.cs" />
     <Compile Include="Views\LoginPage.xaml.cs">
       <DependentUpon>LoginPage.xaml</DependentUpon>
