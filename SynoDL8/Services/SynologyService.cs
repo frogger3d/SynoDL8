@@ -1,7 +1,8 @@
-﻿namespace SynoDL8.Model
+﻿namespace SynoDL8.Services
 {
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using SynoDL8.Model;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -12,7 +13,7 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public class SynologyDataModel : IDataModel
+    public class SynologyService : ISynologyService
     {
         const string LoginQuery = @"{0}/webapi/auth.cgi?api=SYNO.API.Auth&version=2&method=login&account={1}&passwd={2}&session=DownloadStation&format=cookie";
 
@@ -38,7 +39,7 @@
 
         private Credentials credentials;
 
-        public SynologyDataModel(IConfigurationService configurationService)
+        public SynologyService(IConfigurationService configurationService)
         {
             this.HttpClient = new HttpClient();
             this.Cookies = new CookieContainer();

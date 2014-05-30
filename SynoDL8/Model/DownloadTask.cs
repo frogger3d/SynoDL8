@@ -2,6 +2,7 @@
 {
     using Newtonsoft.Json.Linq;
     using ReactiveUI;
+    using SynoDL8.Services;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -67,7 +68,7 @@
         public long SpeedUpload { get; set; }
         public long SpeedDownload { get; set; }
 
-        public static IEnumerable<DownloadTask> FromJason(string jasonString, SynologyDataModel dsquerier)
+        public static IEnumerable<DownloadTask> FromJason(string jasonString, ISynologyService synologyService)
         {
             var root = JObject.Parse(jasonString);
             if (SynologyResponse.FromJason(jasonString).Success)

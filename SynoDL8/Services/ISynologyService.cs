@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SynoDL8.Model;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,9 +7,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SynoDL8.Model
+namespace SynoDL8.Services
 {
-    public interface IDataModel
+    public interface ISynologyService
     {
         Task<bool> LoginAsync(Credentials credentials);
         Task<bool> LogoutAsync();

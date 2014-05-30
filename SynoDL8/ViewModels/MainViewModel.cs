@@ -3,6 +3,7 @@
     using ReactiveUI;
     using ReactiveUI.Xaml;
     using SynoDL8.Model;
+    using SynoDL8.Services;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -19,7 +20,7 @@
 
     public class MainViewModel : ReactiveObject, IMainViewModel
     {
-        private readonly IDataModel DataModel;
+        private readonly ISynologyService SynologyService;
         private readonly ObservableAsPropertyHelper<string> uploadSpeed;
         private readonly ObservableAsPropertyHelper<string> downloadSpeed;
 
@@ -30,9 +31,9 @@
         private IDisposable listSubscription;
         private IDisposable statisticsSubscription;
 
-        public MainViewModel(IDataModel dataModel)
+        public MainViewModel(ISynologyService synologyService)
         {
-            this.DataModel = dataModel;
+            this.SynologyService = synologyService;
 
             this.Content = new ReactiveList<DownloadTaskViewModel>();
 
@@ -58,7 +59,7 @@
                                               .Subscribe();
 
             var statistics = Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(4))
-                                       .Select(_ => Observable.FromAsync(this.DataModel.GetStatisticsAsync))
+                                       .Select(_ => Observable.FromAsync(this.SynologyService.GetStatisticsAsync))
                                        .Switch()                                       
                                        .Publish();
 
@@ -100,12 +101,12 @@
 
         private async Task<string> Versions()
         {
-            return await this.DataModel.GetVersionsAsync();
+            return await this.SynologyService.GetVersionsAsync();
         }
 
         private async Task<string> Info()
         {
-            return await this.DataModel.GetInfoAsync();
+            return await this.SynologyService.GetInfoAsync();
         }
 
         private async Task<bool> Create(object param)
@@ -121,7 +122,7 @@
             }
 
             this.Message = "Starting download";
-            var response = await this.DataModel.CreateTaskAsync(url);
+            var response = await this.SynologyService.CreateTaskAsync(url);
             if (response.Success)
             {
                 return await this.List();
@@ -138,11 +139,11 @@
             string dialogMessage = null;
             try
             {
-                var response = await this.DataModel.List();
+                var response = await this.SynologyService.List();
                 using (this.Content.SuppressChangeNotifications())
                 {
                     this.Content.Clear();
-                    this.Content.AddRange(response.Select(t => new DownloadTaskViewModel(this.DataModel, t)));
+                    this.Content.AddRange(response.Select(t => new DownloadTaskViewModel(this.SynologyService, t)));
                 }
             }
             catch (Exception e)

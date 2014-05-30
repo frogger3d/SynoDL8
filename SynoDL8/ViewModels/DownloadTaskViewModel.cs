@@ -1,6 +1,7 @@
 ﻿using ReactiveUI;
 using ReactiveUI.Xaml;
 using SynoDL8.Model;
+using SynoDL8.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,16 +17,16 @@ namespace SynoDL8.ViewModels
 {
     public class DownloadTaskViewModel : ReactiveObject
     {
-        private IDataModel DataModel;
+        private ISynologyService SynologyService;
         private DownloadTask Task;
 
         private bool busy;
         private BehaviorSubject<bool> areAllAvailable;
 
-        public DownloadTaskViewModel(IDataModel dataModel, DownloadTask task)
+        public DownloadTaskViewModel(ISynologyService synologyService, DownloadTask task)
         {
-            this.Task = task;
-            this.DataModel = dataModel;
+            this.SynologyService = synologyService.ThrowIfNull("synologyService");
+            this.Task = task.ThrowIfNull("task");
 
             areAllAvailable = new BehaviorSubject<bool>(true);
 
@@ -36,9 +37,9 @@ namespace SynoDL8.ViewModels
             Observable.CombineLatest(PauseCommand.IsExecuting, PlayCommand.IsExecuting, (pa, pl) => !(pa || pl))
                       .Subscribe(n => areAllAvailable.OnNext(n));
 
-            this.PlayCommand.RegisterAsyncTask(_ => this.DataModel.ResumeTaskAsync(this.Task.Id)).Subscribe();
-            this.PauseCommand.RegisterAsyncTask(_ => this.DataModel.PauseTaskAsync(this.Task.Id)).Subscribe();
-            this.DeleteCommand.RegisterAsyncTask(_ => this.DataModel.DeleteTaskAsync(this.Task.Id)).Subscribe();
+            this.PlayCommand.RegisterAsyncTask(_ => this.SynologyService.ResumeTaskAsync(this.Task.Id)).Subscribe();
+            this.PauseCommand.RegisterAsyncTask(_ => this.SynologyService.PauseTaskAsync(this.Task.Id)).Subscribe();
+            this.DeleteCommand.RegisterAsyncTask(_ => this.SynologyService.DeleteTaskAsync(this.Task.Id)).Subscribe();
         }
 
         public string VisualState
@@ -82,7 +83,7 @@ namespace SynoDL8.ViewModels
         {
             this.Busy = true;
 
-            this.DataModel.PauseTaskAsync(this.Task.Id)
+            this.SynologyService.PauseTaskAsync(this.Task.Id)
                           .ToObservable()
                           .ObserveOnDispatcher()
                           .Subscribe(
@@ -101,7 +102,7 @@ namespace SynoDL8.ViewModels
         {
             this.Busy = true;
 
-            this.DataModel.ResumeTaskAsync(this.Task.Id)
+            this.SynologyService.ResumeTaskAsync(this.Task.Id)
                           .ToObservable()
                           .ObserveOnDispatcher()
                           .Subscribe(

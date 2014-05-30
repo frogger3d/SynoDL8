@@ -1,6 +1,7 @@
 ﻿using Microsoft.Practices.Prism.StoreApps.Interfaces;
 using ReactiveUI;
 using SynoDL8.Model;
+using SynoDL8.Services;
 using SynoDL8.Views;
 using System;
 using System.Collections;
@@ -26,7 +27,7 @@ namespace SynoDL8.ViewModels
     public class LoginViewModel : ReactiveObject, ILoginViewModel, INavigationAware
     {
         private readonly IConfigurationService ConfigurationService;
-        private readonly IDataModel DataModel;
+        private readonly ISynologyService SynologyService;
 
         private readonly ObservableAsPropertyHelper<Visibility> busyV;
         private readonly ObservableAsPropertyHelper<bool> available;
@@ -35,21 +36,21 @@ namespace SynoDL8.ViewModels
         private bool busy;
         private string signinError;
 
-        public LoginViewModel(IConfigurationService configurationService, IDataModel dataModel)
+        public LoginViewModel(IConfigurationService configurationService, ISynologyService synologyService)
         {
             if (configurationService == null)
             {
                 throw new ArgumentNullException("configurationService");
             }
-            if (dataModel == null)
+            if (synologyService == null)
             {
-                throw new ArgumentNullException("dataModel");
+                throw new ArgumentNullException("synologyService");
             }
 
             this.ConfigurationService = configurationService;
-            this.DataModel = dataModel;
+            this.SynologyService = synologyService;
 
-            this.Credentials = this.ConfigurationService.GetConfiguration();
+            this.Credentials = this.ConfigurationService.GetLastCredentials();
             this.Credentials.IsValidationEnabled = true;
 
             var hasErrorsObservable = Observable.FromEventPattern<DataErrorsChangedEventArgs>(h => this.Credentials.ErrorsChanged += h, h => this.Credentials.ErrorsChanged -= h)
@@ -114,7 +115,7 @@ namespace SynoDL8.ViewModels
 
             try
             {
-                await this.DataModel.LoginAsync(credentials);
+                await this.SynologyService.LoginAsync(credentials);
             }
             catch (HttpRequestException e)
             {
@@ -143,7 +144,7 @@ namespace SynoDL8.ViewModels
                 return false;
             }
 
-            this.ConfigurationService.SaveConfiguration(this.Credentials);
+            this.ConfigurationService.SaveCredentials(this.Credentials);
             return true;
         }
 

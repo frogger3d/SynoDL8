@@ -1,11 +1,12 @@
-﻿using System;
+﻿using SynoDL8.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 
-namespace SynoDL8.Model
+namespace SynoDL8.Services
 {
     public class ConfigurationService : IConfigurationService
     {
@@ -17,7 +18,7 @@ namespace SynoDL8.Model
 
         public event EventHandler Changed;
 
-        public Credentials GetConfiguration()
+        public Credentials GetLastCredentials()
         {
             return new Credentials()
             {
@@ -26,11 +27,11 @@ namespace SynoDL8.Model
                 Password = localSettings.Values[PasswordKey] as string,
             };
         }
-        public void SaveConfiguration(Credentials configuration)
+        public void SaveCredentials(Credentials credentials)
         {
-            localSettings.Values[HostnameKey] = configuration.Hostname;
-            localSettings.Values[UserKey] = configuration.User;
-            localSettings.Values[PasswordKey] = configuration.Password;
+            localSettings.Values[HostnameKey] = credentials.Hostname;
+            localSettings.Values[UserKey] = credentials.User;
+            localSettings.Values[PasswordKey] = credentials.Password;
             
             var handle = this.Changed;
             if(handle != null)
