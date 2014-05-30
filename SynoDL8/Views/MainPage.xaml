@@ -39,19 +39,12 @@
             
             <HubSection Header="Actions">
                 <DataTemplate>
-                    <ItemsControl HorizontalAlignment="Stretch">
-                        <ItemsControl.Resources>
-                            <Style TargetType="Button">
-                                <Setter Property="Margin" Value="2"/>
-                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                            </Style>
-                        </ItemsControl.Resources>
-                        <Button Command="{Binding ListCommand}" Content="List"/>
+                    <ItemsControl>
                         <TextBox Text="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         <Button Command="{Binding CreateCommand}" Content="Create"/>
 
-                        <TextBlock Text="{Binding Path=UploadSpeed}"/>
-                        <TextBlock Text="{Binding Path=DownloadSpeed}"/>
+                        <TextBlock Text="{Binding Path=DownloadSpeed}" Foreground="LightGreen" Style="{StaticResource SubheaderTextBlockStyle}"/>
+                        <TextBlock Text="{Binding Path=UploadSpeed}" Foreground="Red" Style="{StaticResource SubheaderTextBlockStyle}"/>
                     </ItemsControl>
                 </DataTemplate>
             </HubSection>

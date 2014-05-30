@@ -12,6 +12,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Security;
@@ -28,6 +29,7 @@ namespace SynoDL8.ViewModels
     {
         private readonly IConfigurationService ConfigurationService;
         private readonly ISynologyService SynologyService;
+        private readonly INavigationService NavigationService;
 
         private readonly ObservableAsPropertyHelper<Visibility> busyV;
         private readonly ObservableAsPropertyHelper<bool> available;
@@ -36,19 +38,11 @@ namespace SynoDL8.ViewModels
         private bool busy;
         private string signinError;
 
-        public LoginViewModel(IConfigurationService configurationService, ISynologyService synologyService)
+        public LoginViewModel(IConfigurationService configurationService, ISynologyService synologyService, INavigationService navigationService)
         {
-            if (configurationService == null)
-            {
-                throw new ArgumentNullException("configurationService");
-            }
-            if (synologyService == null)
-            {
-                throw new ArgumentNullException("synologyService");
-            }
-
-            this.ConfigurationService = configurationService;
-            this.SynologyService = synologyService;
+            this.ConfigurationService = configurationService.ThrowIfNull("configurationService");
+            this.SynologyService = synologyService.ThrowIfNull("synologyService");
+            this.NavigationService = navigationService.ThrowIfNull("navigationService");
 
             this.Credentials = this.ConfigurationService.GetLastCredentials();
             this.Credentials.IsValidationEnabled = true;
@@ -56,16 +50,21 @@ namespace SynoDL8.ViewModels
             var hasErrorsObservable = Observable.FromEventPattern<DataErrorsChangedEventArgs>(h => this.Credentials.ErrorsChanged += h, h => this.Credentials.ErrorsChanged -= h)
                                                 .Select(e => this.Credentials.GetAllErrors().Any());
 
-            this.SigninCommand = new ReactiveCommand(hasErrorsObservable.Select(e => !e));
+            var canSignin = new BehaviorSubject<bool>(true);
+
+            this.SigninCommand = new ReactiveCommand(canSignin);
             this.SigninCommand.RegisterAsyncTask(_ => this.Signin())
                               .Subscribe(
                                 n =>
                                 {
                                     if (n)
                                     {
-                                        ((Frame)Window.Current.Content).Navigate(typeof(MainPage));
+                                        this.NavigationService.Navigate("Main", null);
                                     }
                                 });
+
+            Observable.CombineLatest(SigninCommand.IsExecuting, hasErrorsObservable, (executing, hasErrors) => !(executing || hasErrors))
+                      .Subscribe(canSignin);
 
             var busyObservable = this.SigninCommand.IsExecuting.StartWith(false);
             this.busyV = busyObservable.Select(b => b ? Visibility.Visible : Visibility.Collapsed)

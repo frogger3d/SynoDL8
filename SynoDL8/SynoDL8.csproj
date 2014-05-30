@@ -126,7 +126,6 @@
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="Services\SynologyService.cs" />
     <Compile Include="Services\ISynologyService.cs" />
-    <Compile Include="SynoDownloadModule.cs" />
     <Compile Include="ViewModels\IMainViewModel.cs" />
     <Compile Include="ViewModels\DownloadTaskViewModel.cs" />
     <Compile Include="Views\LoginPage.xaml.cs">

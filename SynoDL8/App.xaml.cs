@@ -25,6 +25,8 @@ using Autofac;
 using Microsoft.Practices.Prism.StoreApps;
 using SynoDL8.Model;
 using System.Threading.Tasks;
+using Microsoft.Practices.Prism.StoreApps.Interfaces;
+using SynoDL8.Services;
 
 // The Split App template is documented at http://go.microsoft.com/fwlink/?LinkId=234228
 
@@ -49,7 +51,19 @@ namespace SynoDL8
         protected override void OnInitialize(IActivatedEventArgs args)
         {
             ContainerBuilder builder = new ContainerBuilder();
-            builder.RegisterModule(new SynoDownloadModule());
+
+            builder.RegisterInstance(this.NavigationService).As<INavigationService>();
+            builder.RegisterInstance(this.SessionStateService).As<ISessionStateService>();
+
+            // Services
+            builder.RegisterType<SynologyService>().As<ISynologyService>().SingleInstance();
+            builder.RegisterType<ConfigurationService>().As<IConfigurationService>().SingleInstance();
+
+            // ViewModels
+            builder.RegisterType<MainViewModel>().As<IMainViewModel>();
+            builder.RegisterType<DownloadTaskViewModel>().As<DownloadTaskViewModel>();
+            builder.RegisterType<LoginViewModel>().As<ILoginViewModel>();
+
             this.container = builder.Build();
 
             ViewModelLocator.SetDefaultViewTypeToViewModelTypeResolver(viewtype =>

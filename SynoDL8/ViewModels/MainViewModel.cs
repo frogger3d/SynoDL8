@@ -63,9 +63,9 @@
                                        .Switch()                                       
                                        .Publish();
 
-            this.uploadSpeed = statistics.Select(s => (s == null) ? "" : s.UploadSpeed.ToString())
+            this.uploadSpeed = statistics.Select(s => (s == null) ? "" : string.Format("Upload: {0:0} KBps", s.DownloadSpeed / 1000.0))
                                            .ToProperty(this, v => v.UploadSpeed);
-            this.downloadSpeed = statistics.Select(s => (s == null) ? "" : s.UploadSpeed.ToString())
+            this.downloadSpeed = statistics.Select(s => (s == null) ? "" : string.Format("Download: {0:0} KBps", s.DownloadSpeed / 1000.0))
                                            .ToProperty(this, v => v.DownloadSpeed);
 
             this.statisticsSubscription = statistics.Connect();
