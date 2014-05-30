@@ -20,10 +20,22 @@
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
         <Hub>
-            <HubSection>
-                <DataTemplate>
+            <Hub.Header>
+                <!-- Back button and page title -->
+                <Grid x:Name="titlePanel">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <!--<Button x:Name="backButton" Command="{Binding Path=GoBackCommand, ElementName=pageRoot}" Margin="0,0,39,0"
+                            Style="{StaticResource NavigationBackButtonNormalStyle}"/>-->
                     <TextBlock x:Name="pageTitle" Grid.Column="1" x:Uid="applicationTitle" Text="SynoDL8"
                                IsHitTestVisible="false" Style="{StaticResource HeaderTextBlockStyle}"/>
+                </Grid>
+            </Hub.Header>
+
+            <HubSection Background="DarkOrange" MinWidth="400">
+                <DataTemplate>
                 </DataTemplate>
             </HubSection>
             <HubSection>
