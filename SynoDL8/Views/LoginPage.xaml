@@ -12,75 +12,67 @@
     xmlns:prism="using:Microsoft.Practices.Prism.StoreApps"
     mc:Ignorable="d"
     prism:ViewModelLocator.AutoWireViewModel="True">
-    
-    <Page.Resources>
-        <converter:FirstErrorConverter x:Key="FirstErrorConverter"/>
-    </Page.Resources>
 
     <Grid x:Name="grid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-        <Hub x:Name="hub">
-            <Hub.Header>
-                <!-- Back button and page title -->
-                <Grid x:Name="titlePanel">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="80"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <!--<Button x:Name="backButton" Command="{Binding Path=GoBackCommand, ElementName=pageRoot}" Margin="0,0,39,0"
-                            Style="{StaticResource NavigationBackButtonNormalStyle}"/>-->
-                    <TextBlock x:Name="pageTitle" Grid.Column="1" x:Uid="applicationTitle" Text="SynoDL8"
-                               IsHitTestVisible="false" Style="{StaticResource HeaderTextBlockStyle}"/>
-                </Grid>
-            </Hub.Header>
+        <ScrollViewer>
+            <StackPanel Orientation="Horizontal">
+                <Grid Background="DarkOrange" MinWidth="400" x:Name="orangeSection"/>
 
-            <HubSection Background="DarkOrange" MinWidth="400" x:Name="orangeSection">
-                <DataTemplate>
-                </DataTemplate>
-            </HubSection>
-            <HubSection x:Name="formSection">
-                <DataTemplate>
-                    <StackPanel MinWidth="300">
-                        <TextBox x:Uid="hostname" Header="Hostname"
-                                 Text="{Binding Path=Credentials.Hostname, Mode=TwoWay}" IsEnabled="{Binding Path=Available}">
-                            <i:Interaction.Behaviors>
-                                <behavior:HighlightFormFieldOnErrors PropertyErrors="{Binding Path=Credentials.Errors[Hostname]}" />
-                            </i:Interaction.Behaviors>
-                        </TextBox>
-                        <TextBlock Style="{StaticResource ErrorMessageStyle}"
-                                   Text="{Binding Credentials.Errors[Hostname], Converter={StaticResource FirstErrorConverter}}"
-                                   TextWrapping="Wrap" />
+                <ScrollViewer>
+                    <StackPanel Height="1000">
+                        <TextBlock x:Uid="Synology" Text="CONNECTION" Margin="80,140,0,0" Style="{StaticResource SubheaderTextBlockStyle}"/>
+                        
+                        <StackPanel MinWidth="300" Margin="80,10">
+                            <TextBox x:Uid="hostname" Header="Hostname" Margin="0,0,0,10"
+                                     Text="{Binding Path=Credentials.Hostname, Mode=TwoWay}" IsEnabled="{Binding Path=Available}">
+                                <i:Interaction.Behaviors>
+                                    <behavior:HighlightFormFieldOnErrors PropertyErrors="{Binding Path=Credentials.Errors[Hostname]}" />
+                                </i:Interaction.Behaviors>
+                            </TextBox>
+                            <TextBlock Style="{StaticResource ErrorMessageStyle}"
+                                       Text="{Binding Credentials.Errors[Hostname], Converter={StaticResource FirstErrorConverter}}"
+                                       Visibility="{Binding Path=Credentials.Errors[Hostname], Converter={StaticResource TextToHeaderVisibilityConverter}}" />
 
-                        <TextBox x:Uid="user" Header="User"
-                                 Text="{Binding Path=Credentials.User, Mode=TwoWay}" IsEnabled="{Binding Path=Available}">
-                            <i:Interaction.Behaviors>
-                                <behavior:HighlightFormFieldOnErrors PropertyErrors="{Binding Path=Credentials.Errors[User]}" />
-                            </i:Interaction.Behaviors>
-                        </TextBox>
-                        <TextBlock Style="{StaticResource ErrorMessageStyle}"
-                                   Text="{Binding Credentials.Errors[User], Converter={StaticResource FirstErrorConverter}}"
-                                   TextWrapping="Wrap" />
+                            <TextBox x:Uid="user" Header="User" Margin="0,0,0,10"
+                                     Text="{Binding Path=Credentials.User, Mode=TwoWay}" IsEnabled="{Binding Path=Available}">
+                                <i:Interaction.Behaviors>
+                                    <behavior:HighlightFormFieldOnErrors PropertyErrors="{Binding Path=Credentials.Errors[User]}" />
+                                </i:Interaction.Behaviors>
+                            </TextBox>
+                            <TextBlock Style="{StaticResource ErrorMessageStyle}"
+                                       Text="{Binding Credentials.Errors[User], Converter={StaticResource FirstErrorConverter}}"
+                                       Visibility="{Binding Path=Credentials.Errors[User], Converter={StaticResource TextToHeaderVisibilityConverter}}" />
 
-                        <PasswordBox x:Uid="password" Header="Password"
-                                     Password="{Binding Path=Credentials.Password, Mode=TwoWay}" IsEnabled="{Binding Path=Available}">
-                            <i:Interaction.Behaviors>
-                                <behavior:HighlightFormFieldOnErrors PropertyErrors="{Binding Path=Credentials.Errors[Password]}"
-                                                                     OriginalStyleName="BasePasswordBoxStyle" HighlightStyleName="HighlightPasswordBoxStyle" />
-                            </i:Interaction.Behaviors>
-                        </PasswordBox>
-                        <TextBlock Style="{StaticResource ErrorMessageStyle}"
-                                   Text="{Binding Credentials.Errors[Password], Converter={StaticResource FirstErrorConverter}}"
-                                   TextWrapping="Wrap" />
+                            <PasswordBox x:Uid="password" Header="Password" Margin="0,0,0,10"
+                                         Password="{Binding Path=Credentials.Password, Mode=TwoWay}" IsEnabled="{Binding Path=Available}">
+                                <i:Interaction.Behaviors>
+                                    <behavior:HighlightFormFieldOnErrors PropertyErrors="{Binding Path=Credentials.Errors[Password]}"
+                                                                         OriginalStyleName="BasePasswordBoxStyle" HighlightStyleName="HighlightPasswordBoxStyle" />
+                                </i:Interaction.Behaviors>
+                            </PasswordBox>
+                            <TextBlock Style="{StaticResource ErrorMessageStyle}"
+                                       Text="{Binding Credentials.Errors[Password], Converter={StaticResource FirstErrorConverter}}"
+                                       Visibility="{Binding Path=Credentials.Errors[Password], Converter={StaticResource TextToHeaderVisibilityConverter}}" />
 
-						<ProgressBar Visibility="{Binding Path=BusyV}" IsIndeterminate="True"/>
+                            <ProgressBar Visibility="{Binding Path=BusyV}" IsIndeterminate="True"/>
 
-                        <Button Command="{Binding Path=SigninCommand}" Foreground="White" Margin="0 10" x:Uid="signin" Content="Sign in" HorizontalAlignment="Right"/>
+                            <Button Command="{Binding Path=SigninCommand}" Foreground="White" Margin="0 10" x:Uid="signin" Content="Sign in" HorizontalAlignment="Right"/>
 
-                        <TextBlock Foreground="Red" FontWeight="SemiBold" Text="{Binding Path=SigninError}"/>
+                            <TextBlock Text="{Binding Path=SigninError}" Style="{StaticResource ErrorMessageStyle}"/>
+                        </StackPanel>
                     </StackPanel>
-                </DataTemplate>
-            </HubSection>
-        </Hub>
+                </ScrollViewer>
+            </StackPanel>
+        </ScrollViewer>
+        
+        <!-- Back button and page title -->
+        <Grid x:Name="titlePanel" Margin="80,100">
+            <!--<Button x:Name="backButton" Command="{Binding Path=GoBackCommand, ElementName=pageRoot}" Margin="0,0,39,0"
+                    Style="{StaticResource NavigationBackButtonNormalStyle}"/>-->
+            <TextBlock x:Name="pageTitle" x:Uid="applicationTitle" Text="SynoDL8"
+                       IsHitTestVisible="false" Style="{StaticResource HeaderTextBlockStyle}"/>
+        </Grid>
 
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="LayoutGroup">

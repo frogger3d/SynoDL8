@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -28,6 +29,18 @@ namespace SynoDL8.Views
         public LoginPage()
         {
             this.InitializeComponent();
+            InputPane.GetForCurrentView().Showing += LoginPage_Showing;
+            InputPane.GetForCurrentView().Hiding += LoginPage_Hiding;
+        }
+
+        void LoginPage_Hiding(InputPane sender, InputPaneVisibilityEventArgs args)
+        {
+            args.EnsuredFocusedElementInView = false;
+        }
+
+        void LoginPage_Showing(InputPane sender, InputPaneVisibilityEventArgs args)
+        {
+            args.EnsuredFocusedElementInView = true;
         }
     }
 }
