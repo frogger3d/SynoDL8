@@ -28,8 +28,8 @@
         private readonly ObservableAsPropertyHelper<string> downloadSpeed;
         private readonly Credentials Credentials;
         private readonly IConnectableObservable<Statistics> statisticsObservable;
-        private readonly IConnectableObservable<bool> listObservable;
-        private readonly ObservableAsPropertyHelper<bool> hasDownloads, hasFinished;
+        private readonly IConnectableObservable<IEnumerable<DownloadTask>> listObservable;
+        private readonly ObservableAsPropertyHelper<bool> hasActive, hasFinished;
 
         private string message;
         private string url;
@@ -59,36 +59,69 @@
 
             this.VersionsCommand.RegisterAsyncTask(_ => this.Versions()).Subscribe(v => DisplayDialog(v));
             this.InfoCommand.RegisterAsyncTask(_ => this.Info()).Subscribe(v => DisplayDialog(v));
-            this.ListCommand.RegisterAsyncTask(_ => this.List()).Subscribe();
             this.CreateCommand.RegisterAsyncTask(url => this.Create(url)).Subscribe();
 
             this.listObservable = Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(4))
-                                            .ObserveOnDispatcher()
-                                            .Select(t => Observable.FromAsync(this.List))
+                                            .Select(t => Unit.Default)
+                                            .Merge(this.ListCommand.Select(l => Unit.Default))
+                                            .Select(t => this.SynologyService.List().ToObservable())
                                             .Switch()
                                             .Publish();
 
-            this.DownloadingList = this.allTasks.CreateDerivedCollection(t => t, filter: t => t.IsDownloading);
-            this.hasDownloads = this.DownloadingList
-                                    .CountChanged
-                                    .Select(c => c > 0)
-                                    .ToProperty(this, v => v.HasDowloads);
-            this.FinishedList = this.allTasks.CreateDerivedCollection(t => t, filter: t => !t.IsDownloading);
-            this.hasFinished = this.DownloadingList
-                                   .CountChanged
-                                   .Select(c => c > 0)
-                                   .ToProperty(this, v => v.HasFinished);
+            this.listObservable
+                .ObserveOnDispatcher()
+                .Subscribe(newTasks =>
+                {
+                    using (this.allTasks.SuppressChangeNotifications())
+                    {
+                        var removeIds = this.allTasks.Select(t => t.Task.Id).Except(newTasks.Select(t => t.Id));
+                        foreach(var id in removeIds)
+                        {
+                            var task = this.allTasks.Single(t => t.Task.Id == id);
+                            this.allTasks.Remove(task);
+                        }
+
+                        var updateIds = this.allTasks.Select(t => t.Task.Id).Intersect(newTasks.Select(t => t.Id));
+                        foreach(var id in updateIds)
+                        {
+                            var task = this.allTasks.Single(t => t.Task.Id == id);
+                            task.Task = newTasks.Single(t => t.Id == id);
+                        }
+
+                        var addIds = newTasks.Select(t => t.Id).Except(this.allTasks.Select(t => t.Task.Id));
+                        foreach(var id in addIds)
+                        {
+                            var task = newTasks.Single(t => t.Id == id);
+                            this.allTasks.Add(new DownloadTaskViewModel(this.SynologyService, task));
+                        }
+                    }
+                });
+
+            this.ActiveList = this.allTasks
+                .CreateDerivedCollection(t => t, filter: t => t.IsActive, orderer: (t1, t2) => (int)(100 * t2.Progress - 100 * t1.Progress));
+            this.hasActive = this.ActiveList
+                .CountChanged
+                .Select(c => c > 0)
+                .ToProperty(this, v => v.HasActive);
+
+            this.FinishedList = this.allTasks
+                .CreateDerivedCollection(t => t, filter: t => !t.IsActive);
+            this.hasFinished = this.ActiveList
+                .CountChanged
+                .Select(c => c > 0)
+                .ToProperty(this, v => v.HasFinished);
+
             this.statisticsObservable = Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(4))
-                                                  .Select(_ => Observable.FromAsync(this.SynologyService.GetStatisticsAsync))
-                                                  .Switch()                                       
-                                                  .Publish();
+                .Select(_ => Observable.FromAsync(this.SynologyService.GetStatisticsAsync))
+                .Switch()                                       
+                .Publish();
 
-            this.uploadSpeed = statisticsObservable.Select(s => (s == null) ? "" : string.Format("Upload: {0:0} KBps", s.UploadSpeed / 1000.0))
-                                                   .ToProperty(this, v => v.UploadSpeed);
-            this.downloadSpeed = statisticsObservable.Select(s => (s == null) ? "" : string.Format("Download: {0:0} KBps", s.DownloadSpeed / 1000.0))
-                                                     .ToProperty(this, v => v.DownloadSpeed);
-
-            this.Sections = new ReactiveList<string>() { "a", "b", "c", };
+            this.uploadSpeed = statisticsObservable
+                .Select(s => (s == null) ? "" : string.Format("Upload: {0:0} KBps", s.UploadSpeed / 1000.0))
+                .ToProperty(this, v => v.UploadSpeed);
+            this.downloadSpeed = statisticsObservable
+                .Select(s => (s == null) ? "" : string.Format("Download: {0:0} KBps", s.DownloadSpeed / 1000.0))
+                .ToProperty(this, v => v.DownloadSpeed);
         }
 
         public string HostInfo { get; private set; }
@@ -103,12 +136,10 @@
         public ReactiveCommand ListCommand { get; private set; }
         public ReactiveCommand CreateCommand { get; private set; }
 
-        public IReactiveDerivedList<DownloadTaskViewModel> DownloadingList { get; private set; }
-        public bool HasDowloads { get { return this.hasDownloads.Value; } }
+        public IReactiveDerivedList<DownloadTaskViewModel> ActiveList { get; private set; }
+        public bool HasActive { get { return this.hasActive.Value; } }
         public IReactiveDerivedList<DownloadTaskViewModel> FinishedList { get; private set; }
         public bool HasFinished { get { return this.hasFinished.Value; } }
-
-        public ReactiveList<string> Sections { get; set; }
 
         public string Url
         {
@@ -148,56 +179,14 @@
             var response = await this.SynologyService.CreateTaskAsync(url);
             if (response.Success)
             {
-                return await this.List();
+                this.ListCommand.Execute(null);
+                return true;
             }
             else
             {
                 await new MessageDialog(string.Format("Start download failed: {0} ({1})", response.Error, response.ErrorCode)).ShowAsync();
                 return false;
             }
-        }
-
-        private async Task<bool> List()
-        {
-            string dialogMessage = null;
-            try
-            {
-                var newTasks = await this.SynologyService.List();
-                using (this.allTasks.SuppressChangeNotifications())
-                {
-                    var removeIds = this.allTasks.Select(t => t.Task.Id).Except(newTasks.Select(t => t.Id));
-                    foreach(var id in removeIds)
-                    {
-                        var task = this.allTasks.Single(t => t.Task.Id == id);
-                        this.allTasks.Remove(task);
-                    }
-
-                    var updateIds = this.allTasks.Select(t => t.Task.Id).Intersect(newTasks.Select(t => t.Id));
-                    foreach(var id in updateIds)
-                    {
-                        var task = this.allTasks.Single(t => t.Task.Id == id);
-                        task.Task = newTasks.Single(t => t.Id == id);
-                    }
-
-                    var addIds = newTasks.Select(t => t.Id).Except(this.allTasks.Select(t => t.Task.Id));
-                    foreach(var id in addIds)
-                    {
-                        var task = newTasks.Single(t => t.Id == id);
-                        this.allTasks.Add(new DownloadTaskViewModel(this.SynologyService, task));
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                dialogMessage = "Connection failed " + e.Message;
-            }
-
-            if (dialogMessage != null)
-            {
-                await new MessageDialog(dialogMessage).ShowAsync();
-            }
-
-            return dialogMessage != null;
         }
 
         private string GetAndClearUrl()

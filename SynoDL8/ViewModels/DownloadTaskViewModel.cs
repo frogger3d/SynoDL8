@@ -19,7 +19,7 @@ namespace SynoDL8.ViewModels
     {
         private readonly ISynologyService SynologyService;
         private readonly ObservableAsPropertyHelper<string> visualState;
-        private readonly ObservableAsPropertyHelper<bool> isDownloading;
+        private readonly ObservableAsPropertyHelper<bool> isActive;
         private readonly BehaviorSubject<bool> AreAllAvailable;
 
         private bool busy;
@@ -43,7 +43,7 @@ namespace SynoDL8.ViewModels
             this.PauseCommand.RegisterAsyncTask(_ => this.SynologyService.PauseTaskAsync(this.Task.Id)).Subscribe();
             this.DeleteCommand.RegisterAsyncTask(_ => this.SynologyService.DeleteTaskAsync(this.Task.Id)).Subscribe();
 
-            this.isDownloading = this.WhenAny(v => v.Task.Status, a => a)
+            this.isActive = this.WhenAny(v => v.Task.Status, a => a)
                                      .Select(v =>
                                      {
                                          switch (this.Task.Status)
@@ -53,13 +53,14 @@ namespace SynoDL8.ViewModels
                                              case DownloadTask.status.filehosting_waiting:
                                              case DownloadTask.status.finishing:
                                              case DownloadTask.status.waiting:
+                                             case DownloadTask.status.paused:
                                                  return true;
 
                                              default:
                                                  return false;
                                          }
                                      })
-                                     .ToProperty(this, v => v.IsDownloading);
+                                     .ToProperty(this, v => v.IsActive);
 
             this.visualState = this.WhenAny(v => v.Task.Status, a => a)
                                      .Select(v =>
@@ -154,9 +155,9 @@ namespace SynoDL8.ViewModels
                               });
         }
 
-        public bool IsDownloading
+        public bool IsActive
         {
-            get { return this.isDownloading.Value; }
+            get { return this.isActive.Value; }
         }
     }
 }

@@ -62,9 +62,9 @@
                     </StackPanel>
                 </DataTemplate>
             </HubSection>
-            <HubSection Header="Downloads"> <!--Visibility="{Binding Path=HasDownloading, Converter={StaticResource BooleanToVisibilityConverter}}">-->
+            <HubSection Header="Active" Visibility="{Binding Path=HasActive, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <DataTemplate>
-                    <ItemsControl ItemsSource="{Binding DownloadingList}" ItemTemplate="{StaticResource taskTemplate}">
+                    <ItemsControl ItemsSource="{Binding ActiveList}" ItemTemplate="{StaticResource taskTemplate}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <ItemsWrapGrid/>
@@ -74,7 +74,7 @@
                 </DataTemplate>
             </HubSection>
             
-            <HubSection Header="Finished"> <!--Visibility="{Binding Path=HasFinished, Converter={StaticResource BooleanToVisibilityConverter}}">-->
+            <HubSection Header="Finished" Visibility="{Binding Path=HasFinished, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <DataTemplate>
                     <ItemsControl ItemsSource="{Binding FinishedList}" ItemTemplate="{StaticResource taskTemplate}">
                         <ItemsControl.ItemsPanel>
