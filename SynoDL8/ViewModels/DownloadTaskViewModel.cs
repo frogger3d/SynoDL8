@@ -54,10 +54,17 @@ namespace SynoDL8.ViewModels
                                              case DownloadTask.status.finishing:
                                              case DownloadTask.status.waiting:
                                              case DownloadTask.status.paused:
+                                             case DownloadTask.status.hash_checking:
                                                  return true;
 
-                                             default:
+                                             case DownloadTask.status.error:
+                                             case DownloadTask.status.finished:
+                                             case DownloadTask.status.seeding:
+                                             case DownloadTask.status.unknown:
                                                  return false;
+
+                                             default:
+                                                 throw new InvalidOperationException("Unknown status");
                                          }
                                      })
                                      .ToProperty(this, v => v.IsActive);
