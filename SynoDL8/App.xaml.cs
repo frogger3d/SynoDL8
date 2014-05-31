@@ -1,11 +1,18 @@
-﻿using SynoDL8.Common;
-using SynoDL8.Views;
+﻿using Autofac;
+using Microsoft.Practices.Prism.StoreApps;
+using Microsoft.Practices.Prism.StoreApps.Interfaces;
+using SynoDL8.Common;
+using SynoDL8.Model;
+using SynoDL8.Services;
 using SynoDL8.ViewModels;
+using SynoDL8.Views;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Resources;
@@ -21,13 +28,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
-using Autofac;
-using Microsoft.Practices.Prism.StoreApps;
-using SynoDL8.Model;
-using System.Threading.Tasks;
-using Microsoft.Practices.Prism.StoreApps.Interfaces;
-using SynoDL8.Services;
-using System.Globalization;
 
 // The Split App template is documented at http://go.microsoft.com/fwlink/?LinkId=234228
 
@@ -66,15 +66,6 @@ namespace SynoDL8
             builder.RegisterType<LoginPageViewModel>().AsSelf();
 
             this.container = builder.Build();
-
-            //ViewModelLocator.SetDefaultViewTypeToViewModelTypeResolver((viewType) =>
-            //{
-            //    //var viewName = viewType.Name.EndsWith("Page") ? viewType.Name.Substring(0, viewType.Name.Length - 4) : viewType.Name;
-            //    var viewName = viewType.Name;
-            //    var viewModelTypeName = string.Format(CultureInfo.InvariantCulture, "SynoDL8.ViewModels.{0}ViewModel", viewName);
-            //    var viewModelType = Type.GetType(viewModelTypeName);
-            //    return viewModelType;
-            //});
 
             ViewModelLocator.SetDefaultViewModelFactory(vmtype =>
             {

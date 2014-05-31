@@ -14,6 +14,7 @@
         <ResourceDictionary>
             <converter:TextToHeaderVisibilityConverter x:Key="TextToHeaderVisibilityConverter"/>
             <converter:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converter:FirstErrorConverter x:Key="FirstErrorConverter"/>
 
             <DataTemplate x:Key="stringTemplate">
                 <TextBlock Text="{Binding}"/>
@@ -34,7 +35,8 @@
             
             <Style x:Key="ErrorMessageStyle" TargetType="TextBlock">
                 <Setter Property="Foreground" Value="Red" />
-                <Setter Property="Margin" Value="5,0" />
+                <Setter Property="Margin" Value="5,0,5,10" />
+                <Setter Property="TextWrapping" Value="Wrap"/>
                 <Setter Property="FontSize" Value="{StaticResource ControlContentThemeFontSize}" />
                 <Setter Property="FontFamily" Value="{StaticResource ContentControlThemeFontFamily}" />
             </Style>
