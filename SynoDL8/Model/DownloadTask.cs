@@ -68,6 +68,33 @@
         public long SpeedUpload { get; set; }
         public long SpeedDownload { get; set; }
 
+        public bool IsActive
+        {
+            get
+            {
+                switch (this.Status)
+                {
+                    case DownloadTask.status.downloading:
+                    case DownloadTask.status.extracting:
+                    case DownloadTask.status.filehosting_waiting:
+                    case DownloadTask.status.finishing:
+                    case DownloadTask.status.waiting:
+                    case DownloadTask.status.paused:
+                    case DownloadTask.status.hash_checking:
+                        return true;
+
+                    case DownloadTask.status.error:
+                    case DownloadTask.status.finished:
+                    case DownloadTask.status.seeding:
+                    case DownloadTask.status.unknown:
+                        return false;
+
+                    default:
+                        throw new InvalidOperationException("Unknown status");
+                }
+            }
+        }
+
         public static IEnumerable<DownloadTask> FromJason(string jasonString, ISynologyService synologyService)
         {
             var root = JObject.Parse(jasonString);
