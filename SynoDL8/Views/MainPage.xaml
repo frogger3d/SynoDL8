@@ -38,6 +38,75 @@
     </Page.BottomAppBar>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    	<VisualStateManager.VisualStateGroups>
+    		<VisualStateGroup x:Name="LayoutGroup">
+    			<VisualState x:Name="DefaultLayout"/>
+    			<VisualState x:Name="MinimalLayout">
+					<Storyboard>
+    					<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Hub.Orientation)" Storyboard.TargetName="horizontalHub">
+    						<DiscreteObjectKeyFrame KeyTime="0">
+    							<DiscreteObjectKeyFrame.Value>
+    								<Orientation>Vertical</Orientation>
+    							</DiscreteObjectKeyFrame.Value>
+    						</DiscreteObjectKeyFrame>
+    					</ObjectAnimationUsingKeyFrames>
+    					<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.HorizontalAlignment)" Storyboard.TargetName="hubSection">
+    						<DiscreteObjectKeyFrame KeyTime="0">
+    							<DiscreteObjectKeyFrame.Value>
+    								<HorizontalAlignment>Stretch</HorizontalAlignment>
+    							</DiscreteObjectKeyFrame.Value>
+    						</DiscreteObjectKeyFrame>
+    					</ObjectAnimationUsingKeyFrames>
+    					<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.HorizontalAlignment)" Storyboard.TargetName="hubSection1">
+    						<DiscreteObjectKeyFrame KeyTime="0">
+    							<DiscreteObjectKeyFrame.Value>
+    								<HorizontalAlignment>Stretch</HorizontalAlignment>
+    							</DiscreteObjectKeyFrame.Value>
+    						</DiscreteObjectKeyFrame>
+    					</ObjectAnimationUsingKeyFrames>
+    					<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.HorizontalAlignment)" Storyboard.TargetName="hubSection2">
+    						<DiscreteObjectKeyFrame KeyTime="0">
+    							<DiscreteObjectKeyFrame.Value>
+    								<HorizontalAlignment>Stretch</HorizontalAlignment>
+    							</DiscreteObjectKeyFrame.Value>
+    						</DiscreteObjectKeyFrame>
+    					</ObjectAnimationUsingKeyFrames>
+    				</Storyboard>
+				</VisualState>
+    			<VisualState x:Name="PortraitLayout">
+    				<Storyboard>
+    					<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Hub.Orientation)" Storyboard.TargetName="horizontalHub">
+    						<DiscreteObjectKeyFrame KeyTime="0">
+    							<DiscreteObjectKeyFrame.Value>
+    								<Orientation>Vertical</Orientation>
+    							</DiscreteObjectKeyFrame.Value>
+    						</DiscreteObjectKeyFrame>
+    					</ObjectAnimationUsingKeyFrames>
+    					<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.HorizontalAlignment)" Storyboard.TargetName="hubSection">
+    						<DiscreteObjectKeyFrame KeyTime="0">
+    							<DiscreteObjectKeyFrame.Value>
+    								<HorizontalAlignment>Stretch</HorizontalAlignment>
+    							</DiscreteObjectKeyFrame.Value>
+    						</DiscreteObjectKeyFrame>
+    					</ObjectAnimationUsingKeyFrames>
+    					<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.HorizontalAlignment)" Storyboard.TargetName="hubSection1">
+    						<DiscreteObjectKeyFrame KeyTime="0">
+    							<DiscreteObjectKeyFrame.Value>
+    								<HorizontalAlignment>Stretch</HorizontalAlignment>
+    							</DiscreteObjectKeyFrame.Value>
+    						</DiscreteObjectKeyFrame>
+    					</ObjectAnimationUsingKeyFrames>
+    					<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.HorizontalAlignment)" Storyboard.TargetName="hubSection2">
+    						<DiscreteObjectKeyFrame KeyTime="0">
+    							<DiscreteObjectKeyFrame.Value>
+    								<HorizontalAlignment>Stretch</HorizontalAlignment>
+    							</DiscreteObjectKeyFrame.Value>
+    						</DiscreteObjectKeyFrame>
+    					</ObjectAnimationUsingKeyFrames>
+    				</Storyboard>
+    			</VisualState>
+    		</VisualStateGroup>
+    	</VisualStateManager.VisualStateGroups>
         <Hub x:Name="horizontalHub" >
             <Hub.Header>
                 <!-- Back button and page title -->
@@ -53,7 +122,7 @@
                 </Grid>
             </Hub.Header>
 
-            <HubSection Header="{Binding Path=HostInfo}" Background="DarkOrange" MinWidth="400">
+            <HubSection x:Name="hubSection" Header="{Binding Path=HostInfo}" Background="DarkOrange" MinWidth="400">
                 <DataTemplate>
                     <StackPanel>
                         <TextBlock Text="{Binding Path=DownloadSpeed}" Foreground="LightGreen" Style="{StaticResource SubheaderTextBlockStyle}"/>
@@ -62,7 +131,7 @@
                     </StackPanel>
                 </DataTemplate>
             </HubSection>
-            <HubSection Header="Active" Visibility="{Binding Path=HasActive, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <HubSection x:Name="hubSection1" Header="Active" Visibility="{Binding Path=HasActive, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <DataTemplate>
                     <ItemsControl ItemsSource="{Binding ActiveList}" ItemTemplate="{StaticResource taskTemplate}">
                         <ItemsControl.ItemsPanel>
@@ -74,7 +143,7 @@
                 </DataTemplate>
             </HubSection>
             
-            <HubSection Header="Finished" Visibility="{Binding Path=HasFinished, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <HubSection x:Name="hubSection2" Header="Finished" Visibility="{Binding Path=HasFinished, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <DataTemplate>
                     <ItemsControl ItemsSource="{Binding FinishedList}" ItemTemplate="{StaticResource taskTemplate}">
                         <ItemsControl.ItemsPanel>
