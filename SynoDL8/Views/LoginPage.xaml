@@ -67,11 +67,18 @@
         </ScrollViewer>
         
         <!-- Back button and page title -->
-        <Grid x:Name="titlePanel" Margin="80,100">
+        <Grid x:Name="titlePanel" Margin="80,0" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
             <!--<Button x:Name="backButton" Command="{Binding Path=GoBackCommand, ElementName=pageRoot}" Margin="0,0,39,0"
                     Style="{StaticResource NavigationBackButtonNormalStyle}"/>-->
-            <TextBlock x:Name="pageTitle" x:Uid="applicationTitle" Text="SynoDL8"
-                       IsHitTestVisible="false" Style="{StaticResource HeaderTextBlockStyle}"/>
+            <TextBlock x:Name="pageTitle" x:Uid="applicationTitle" Text="SynoDL8" VerticalAlignment="Bottom"
+                       Grid.Column="1" IsHitTestVisible="false" Style="{StaticResource HeaderTextBlockStyle}"/>
         </Grid>
 
         <VisualStateManager.VisualStateGroups>
