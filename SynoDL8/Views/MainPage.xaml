@@ -131,12 +131,13 @@
                     </StackPanel>
                 </DataTemplate>
             </HubSection>
+            
             <HubSection x:Name="hubSection1" Header="Active" Visibility="{Binding Path=HasActive, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <DataTemplate>
                     <ItemsControl ItemsSource="{Binding ActiveList}" ItemTemplate="{StaticResource taskTemplate}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <ItemsWrapGrid/>
+                                <VariableSizedWrapGrid MaximumRowsOrColumns="5" Orientation="Vertical"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
@@ -148,7 +149,7 @@
                     <ItemsControl ItemsSource="{Binding FinishedList}" ItemTemplate="{StaticResource taskTemplate}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <ItemsWrapGrid/>
+                                <VariableSizedWrapGrid MaximumRowsOrColumns="5" Orientation="Vertical"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
