@@ -17,9 +17,9 @@ using Windows.UI.Xaml.Navigation;
 
 namespace SynoDL8.Views
 {
-    public sealed partial class TaskView : UserControl
+    public sealed partial class DownloadTaskView : UserControl
     {
-        public TaskView()
+        public DownloadTaskView()
         {
             this.InitializeComponent();
         }

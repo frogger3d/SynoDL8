@@ -15,7 +15,7 @@ using Windows.UI.Popups;
 
 namespace SynoDL8.ViewModels
 {
-    public class DownloadTaskViewModel : ReactiveObject
+    public class DownloadTaskViewViewModel : ReactiveObject
     {
         private readonly ISynologyService SynologyService;
         private readonly ObservableAsPropertyHelper<string> visualState;
@@ -25,7 +25,7 @@ namespace SynoDL8.ViewModels
         private bool busy;
         private DownloadTask task;
 
-        public DownloadTaskViewModel(ISynologyService synologyService, DownloadTask task)
+        public DownloadTaskViewViewModel(ISynologyService synologyService, DownloadTask task)
         {
             this.SynologyService = synologyService.ThrowIfNull("synologyService");
             this.Task = task.ThrowIfNull("task");

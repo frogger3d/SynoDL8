@@ -21,7 +21,7 @@
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Navigation;
 
-    public class MainViewModel : ReactiveObject, INavigationAware, IDisposable
+    public class MainPageViewModel : ReactiveObject, INavigationAware, IDisposable
     {
         private readonly ISynologyService SynologyService;
         private readonly ObservableAsPropertyHelper<string> uploadSpeed;
@@ -37,15 +37,15 @@
         private IDisposable listSubscription;
         private IDisposable statisticsSubscription;
 
-        private ReactiveList<DownloadTaskViewModel> allTasks;
+        private ReactiveList<DownloadTaskViewViewModel> allTasks;
 
-        public MainViewModel(ISynologyService synologyService, IConfigurationService configurationService)
+        public MainPageViewModel(ISynologyService synologyService, IConfigurationService configurationService)
         {
             this.SynologyService = synologyService.ThrowIfNull("synologyService");
             this.Credentials = configurationService.ThrowIfNull("configurationService").GetLastCredentials();
             this.HostInfo = string.Format("{0} @ {1}", this.Credentials.User, this.Credentials.Hostname);
 
-            this.allTasks = new ReactiveList<DownloadTaskViewModel>();
+            this.allTasks = new ReactiveList<DownloadTaskViewViewModel>();
 
             var available = new BehaviorSubject<bool>(true);
 
@@ -70,32 +70,7 @@
 
             this.listObservable
                 .ObserveOnDispatcher()
-                .Subscribe(newTasks =>
-                {
-                    using (this.allTasks.SuppressChangeNotifications())
-                    {
-                        var removeIds = this.allTasks.Select(t => t.Task.Id).Except(newTasks.Select(t => t.Id));
-                        foreach(var id in removeIds)
-                        {
-                            var task = this.allTasks.Single(t => t.Task.Id == id);
-                            this.allTasks.Remove(task);
-                        }
-
-                        var updateIds = this.allTasks.Select(t => t.Task.Id).Intersect(newTasks.Select(t => t.Id));
-                        foreach(var id in updateIds)
-                        {
-                            var task = this.allTasks.Single(t => t.Task.Id == id);
-                            task.Task = newTasks.Single(t => t.Id == id);
-                        }
-
-                        var addIds = newTasks.Select(t => t.Id).Except(this.allTasks.Select(t => t.Task.Id));
-                        foreach(var id in addIds)
-                        {
-                            var task = newTasks.Single(t => t.Id == id);
-                            this.allTasks.Add(new DownloadTaskViewModel(this.SynologyService, task));
-                        }
-                    }
-                });
+                .Subscribe(newTasks => UpdateList(newTasks, this.allTasks));
 
             this.ActiveList = this.allTasks
                 .CreateDerivedCollection(t => t, filter: t => t.IsActive, orderer: (t1, t2) => (int)(100 * t2.Progress - 100 * t1.Progress));
@@ -124,6 +99,33 @@
                 .ToProperty(this, v => v.DownloadSpeed);
         }
 
+        private void UpdateList(IEnumerable<DownloadTask> newTasks, ReactiveList<DownloadTaskViewViewModel> list)
+        {
+            using (list.SuppressChangeNotifications())
+            {
+                var removeIds = list.Select(t => t.Task.Id).Except(newTasks.Select(t => t.Id));
+                foreach (var id in removeIds)
+                {
+                    var task = list.Single(t => t.Task.Id == id);
+                    list.Remove(task);
+                }
+
+                var updateIds = list.Select(t => t.Task.Id).Intersect(newTasks.Select(t => t.Id));
+                foreach (var id in updateIds)
+                {
+                    var task = list.Single(t => t.Task.Id == id);
+                    task.Task = newTasks.Single(t => t.Id == id);
+                }
+
+                var addIds = newTasks.Select(t => t.Id).Except(list.Select(t => t.Task.Id));
+                foreach (var id in addIds)
+                {
+                    var task = newTasks.Single(t => t.Id == id);
+                    list.Add(new DownloadTaskViewViewModel(this.SynologyService, task));
+                }
+            }
+        }
+
         public string HostInfo { get; private set; }
 
         private async void DisplayDialog(string v)
@@ -136,10 +138,17 @@
         public ReactiveCommand ListCommand { get; private set; }
         public ReactiveCommand CreateCommand { get; private set; }
 
-        public IReactiveDerivedList<DownloadTaskViewModel> ActiveList { get; private set; }
-        public bool HasActive { get { return this.hasActive.Value; } }
-        public IReactiveDerivedList<DownloadTaskViewModel> FinishedList { get; private set; }
-        public bool HasFinished { get { return this.hasFinished.Value; } }
+        public IReactiveDerivedList<DownloadTaskViewViewModel> ActiveList { get; private set; }
+        public bool HasActive
+        {
+            get { return this.hasActive.Value; }
+        }
+
+        public IReactiveDerivedList<DownloadTaskViewViewModel> FinishedList { get; private set; }
+        public bool HasFinished
+        {
+            get { return this.hasFinished.Value; }
+        }
 
         public string Url
         {

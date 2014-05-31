@@ -20,7 +20,7 @@
             </DataTemplate>
             
             <DataTemplate x:Key="taskTemplate">
-                <view:TaskView />
+                <view:DownloadTaskView />
             </DataTemplate>
             
             <local:ContentDataTemplateSelector x:Key="ContentDataTemplateSelector"

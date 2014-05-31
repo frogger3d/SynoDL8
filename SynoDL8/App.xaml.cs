@@ -61,19 +61,20 @@ namespace SynoDL8
             builder.RegisterType<ConfigurationService>().As<IConfigurationService>().SingleInstance();
 
             // ViewModels
-            builder.RegisterType<MainViewModel>().AsSelf();
-            builder.RegisterType<DownloadTaskViewModel>().AsSelf();
-            builder.RegisterType<LoginViewModel>().AsSelf();
+            builder.RegisterType<MainPageViewModel>().AsSelf();
+            builder.RegisterType<DownloadTaskViewViewModel>().AsSelf();
+            builder.RegisterType<LoginPageViewModel>().AsSelf();
 
             this.container = builder.Build();
 
-            ViewModelLocator.SetDefaultViewTypeToViewModelTypeResolver((viewType) =>
-            {
-                var viewName = viewType.Name.EndsWith("Page") ? viewType.Name.Substring(0, viewType.Name.Length - 4) : viewType.Name;
-                var viewModelTypeName = string.Format(CultureInfo.InvariantCulture, "SynoDL8.ViewModels.{0}ViewModel", viewName);
-                var viewModelType = Type.GetType(viewModelTypeName);
-                return viewModelType;
-            });
+            //ViewModelLocator.SetDefaultViewTypeToViewModelTypeResolver((viewType) =>
+            //{
+            //    //var viewName = viewType.Name.EndsWith("Page") ? viewType.Name.Substring(0, viewType.Name.Length - 4) : viewType.Name;
+            //    var viewName = viewType.Name;
+            //    var viewModelTypeName = string.Format(CultureInfo.InvariantCulture, "SynoDL8.ViewModels.{0}ViewModel", viewName);
+            //    var viewModelType = Type.GetType(viewModelTypeName);
+            //    return viewModelType;
+            //});
 
             ViewModelLocator.SetDefaultViewModelFactory(vmtype =>
             {

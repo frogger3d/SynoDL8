@@ -28,7 +28,7 @@ namespace SynoDL8
             {
                 return this.ExceptionTemplate;
             }
-            else if (item is DownloadTaskViewModel)
+            else if (item is DownloadTaskViewViewModel)
             {
                 return this.TaskTemplate;
             }

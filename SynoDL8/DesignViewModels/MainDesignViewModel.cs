@@ -35,7 +35,7 @@
 
         public string Message { get; set; }
 
-        public ReactiveList<DownloadTaskViewModel> Content { get; set; }
+        public ReactiveList<DownloadTaskViewViewModel> Content { get; set; }
 
         public string UploadSpeed { get; set; }
 

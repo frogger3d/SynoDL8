@@ -25,7 +25,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace SynoDL8.ViewModels
 {
-    public class LoginViewModel : ReactiveObject, INavigationAware
+    public class LoginPageViewModel : ReactiveObject, INavigationAware
     {
         private readonly IConfigurationService ConfigurationService;
         private readonly ISynologyService SynologyService;
@@ -38,7 +38,7 @@ namespace SynoDL8.ViewModels
         private bool busy;
         private string signinError;
 
-        public LoginViewModel(IConfigurationService configurationService, ISynologyService synologyService, INavigationService navigationService)
+        public LoginPageViewModel(IConfigurationService configurationService, ISynologyService synologyService, INavigationService navigationService)
         {
             this.ConfigurationService = configurationService.ThrowIfNull("configurationService");
             this.SynologyService = synologyService.ThrowIfNull("synologyService");
