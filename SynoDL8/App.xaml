@@ -44,7 +44,7 @@
                     <Setter.Value>
                         <DataTemplate>
                             <TextBlock Margin="0" Padding="0" Text="{Binding}" 
-                               Visibility="{Binding Converter={StaticResource TextToHeaderVisibilityConverter}}"/>
+                                       Visibility="{Binding Converter={StaticResource TextToHeaderVisibilityConverter}}"/>
                         </DataTemplate>
                     </Setter.Value>
                 </Setter>
@@ -57,7 +57,7 @@
                     <Setter.Value>
                         <DataTemplate>
                             <TextBlock Margin="0" Padding="0" Foreground="Red" Text="{Binding}" 
-                               Visibility="{Binding Converter={StaticResource TextToHeaderVisibilityConverter}}"/>
+                                       Visibility="{Binding Converter={StaticResource TextToHeaderVisibilityConverter}}"/>
                         </DataTemplate>
                     </Setter.Value>
                 </Setter>
@@ -68,7 +68,7 @@
                     <Setter.Value>
                         <DataTemplate>
                             <TextBlock Margin="0" Padding="0" Text="{Binding}" 
-                               Visibility="{Binding Converter={StaticResource TextToHeaderVisibilityConverter}}"/>
+                                       Visibility="{Binding Converter={StaticResource TextToHeaderVisibilityConverter}}"/>
                         </DataTemplate>
                     </Setter.Value>
                 </Setter>
@@ -81,7 +81,7 @@
                     <Setter.Value>
                         <DataTemplate>
                             <TextBlock Margin="0" Padding="0" Foreground="Red" Text="{Binding}" 
-                               Visibility="{Binding Converter={StaticResource TextToHeaderVisibilityConverter}}"/>
+                                       Visibility="{Binding Converter={StaticResource TextToHeaderVisibilityConverter}}"/>
                         </DataTemplate>
                     </Setter.Value>
                 </Setter>
