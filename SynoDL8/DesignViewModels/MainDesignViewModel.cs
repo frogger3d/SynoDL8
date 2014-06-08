@@ -27,6 +27,16 @@
             this.DownloadSpeed = "Download 50 KBps";
             this.HostInfo = @"Geoffrey @ http://mydiskstation:5000";
             this.Message = "Dumb message";
+            this.ActiveList = new List<DownloadTaskDesignViewModel>();
+            foreach (var i in Enumerable.Range(0, 4))
+            {
+                this.ActiveList.Add(new DownloadTaskDesignViewModel());
+            }
+            this.FinishedList = new List<DownloadTaskDesignViewModel>();
+            foreach (var i in Enumerable.Range(0, 6))
+            {
+                this.FinishedList.Add(new DownloadTaskDesignViewModel());
+            }
         }
 
         public string HostInfo { get; set; }
@@ -35,7 +45,8 @@
 
         public string Message { get; set; }
 
-        public ReactiveList<DownloadTaskViewViewModel> Content { get; set; }
+        public List<DownloadTaskDesignViewModel> ActiveList { get; set; }
+        public List<DownloadTaskDesignViewModel> FinishedList { get; set; }
 
         public string UploadSpeed { get; set; }
 
