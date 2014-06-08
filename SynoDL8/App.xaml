@@ -21,14 +21,9 @@
             </DataTemplate>
             
             <DataTemplate x:Key="taskTemplate">
-                <view:DownloadTaskView />
+                <view:DownloadTaskView Width="500" />
             </DataTemplate>
             
-            <local:ContentDataTemplateSelector x:Key="ContentDataTemplateSelector"
-                                               StringTemplate="{StaticResource stringTemplate}"
-                                               TaskTemplate="{StaticResource taskTemplate}"
-                                               />
-
             <Style x:Key="FlyoutStyle" TargetType="FlyoutPresenter">
                 <Setter Property="Padding" Value="0" />
             </Style>
