@@ -44,6 +44,13 @@ namespace SynoDL8
             this.InitializeComponent();
         }
 
+        protected override void OnRegisterKnownTypesForSerialization()
+        {
+            base.OnRegisterKnownTypesForSerialization();
+            SessionStateService.RegisterKnownType(typeof(Credentials));
+            SessionStateService.RegisterKnownType(typeof(DownloadTask));
+        }
+
         protected override void OnInitialize(IActivatedEventArgs args)
         {
             ContainerBuilder builder = new ContainerBuilder();

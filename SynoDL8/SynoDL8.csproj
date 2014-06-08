@@ -119,6 +119,7 @@
     <Compile Include="DesignViewModels\LoginPageDesignViewModel.cs" />
     <Compile Include="DesignViewModels\MainDesignViewModel.cs" />
     <Compile Include="DesignViewModels\PreviousCredentialsDesignViewModel.cs" />
+    <Compile Include="IReactiveObjectMixins.cs" />
     <Compile Include="Model\Credentials.cs" />
     <Compile Include="Model\DownloadRequest.cs" />
     <Compile Include="Services\IConfigurationService.cs" />

@@ -1,10 +1,13 @@
 ﻿using Microsoft.Practices.Prism.StoreApps;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,9 +15,24 @@ namespace SynoDL8.Model
 {
     public class Credentials : ValidatableBindableBase, IEquatable<Credentials>
     {
+        private bool isValid;
+
         private string hostname;
         private string user;
         private string password;
+
+        public Credentials()
+        {
+            Observable.FromEventPattern<DataErrorsChangedEventArgs>(h => this.ErrorsChanged += h, h => this.ErrorsChanged -= h)
+                .Select(e => this.ValidateProperties())
+                .StartWith(this.ValidateProperties())
+                .Subscribe(v => this.SetProperty(ref this.isValid, v, "IsValid"));
+        }
+
+        public bool IsValid
+        {
+            get { return this.isValid; }            
+        }
 
         [CustomValidation(typeof(Credentials), "ValidateHostname")]
         [Required]

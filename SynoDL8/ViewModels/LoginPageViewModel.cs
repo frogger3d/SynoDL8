@@ -1,4 +1,5 @@
-﻿using Microsoft.Practices.Prism.StoreApps.Interfaces;
+﻿using Microsoft.Practices.Prism.StoreApps;
+using Microsoft.Practices.Prism.StoreApps.Interfaces;
 using ReactiveUI;
 using SynoDL8.Model;
 using SynoDL8.Services;
@@ -51,7 +52,7 @@ namespace SynoDL8.ViewModels
             var previousCredentialsViewModels = this.ConfigurationService.GetAllCredentials()
                 .Select(c => new PreviousCredentialsViewModel(c))
                 .ToList(); // make sure we subscribe to the actual list, otherwise the subscriptions would get lost on requery
-            foreach(var vm in previousCredentialsViewModels)
+            foreach (var vm in previousCredentialsViewModels)
             {
                 var current = vm; // prevent all anonymous methods to reference the last instance
                 current.Remove.Subscribe(_ =>
@@ -69,32 +70,33 @@ namespace SynoDL8.ViewModels
             this.Previous = new ReactiveList<PreviousCredentialsViewModel>();
             this.Previous.AddRange(previousCredentialsViewModels);
 
-            var hasErrorsObservable = Observable.FromEventPattern<DataErrorsChangedEventArgs>(h => this.Credentials.ErrorsChanged += h, h => this.Credentials.ErrorsChanged -= h)
-                                                .Select(e => this.Credentials.GetAllErrors().Any());
-
             var canSignin = new BehaviorSubject<bool>(true);
 
             this.SigninCommand = new ReactiveCommand(canSignin);
             this.SigninCommand.RegisterAsyncTask(_ => this.Signin())
-                              .Subscribe(
-                                n =>
-                                {
-                                    if (n)
-                                    {
-                                        this.NavigationService.Navigate("Main", null);
-                                    }
-                                });
+                .Subscribe(
+                n =>
+                {
+                    if (n)
+                    {
+                        this.NavigationService.Navigate("Main", null);
+                    }
+                });
 
+            var hasErrorsObservable = this.WhenAny(v => v.Credentials.IsValid, v => !v.Value);
             Observable.CombineLatest(SigninCommand.IsExecuting, hasErrorsObservable, (executing, hasErrors) => !(executing || hasErrors))
-                      .Subscribe(canSignin);
+                .Subscribe(canSignin);
 
             var busyObservable = this.SigninCommand.IsExecuting.StartWith(false);
-            this.busyV = busyObservable.Select(b => b ? Visibility.Visible : Visibility.Collapsed)
-                                       .ToProperty(this, v => v.BusyV);
-            this.available= busyObservable.Select(b => !b)
-                                          .ToProperty(this, v => v.Available);
-        }        
+            this.busyV = busyObservable
+                .Select(b => b ? Visibility.Visible : Visibility.Collapsed)
+                .ToProperty(this, v => v.BusyV);
 
+            this.available = busyObservable.Select(b => !b)
+                .ToProperty(this, v => v.Available);
+        }
+
+        [RestorableState]
         public Credentials Credentials
         {
             get { return this.credentials; }
@@ -177,10 +179,12 @@ namespace SynoDL8.ViewModels
 
         public void OnNavigatedFrom(Dictionary<string, object> viewModelState, bool suspending)
         {
+            this.FillStateDictionary(viewModelState);
         }
 
         public void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)
         {
+            this.RestoreViewModel(viewModelState);
         }
     }
 }
