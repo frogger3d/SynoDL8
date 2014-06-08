@@ -16,7 +16,12 @@
     prism:ViewModelLocator.AutoWireViewModel="True">
 
     <Grid x:Name="grid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
+        <Grid.ChildrenTransitions>
+            <TransitionCollection>
+                <EntranceThemeTransition/>
+            </TransitionCollection>
+        </Grid.ChildrenTransitions>
+        
         <ScrollViewer>
             <StackPanel Orientation="Horizontal">
                 <Grid Background="DarkOrange" MinWidth="400" x:Name="orangeSection"/>

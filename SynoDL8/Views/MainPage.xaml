@@ -38,6 +38,12 @@
     </Page.BottomAppBar>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.ChildrenTransitions>
+            <TransitionCollection>
+                <EntranceThemeTransition/>
+            </TransitionCollection>
+        </Grid.ChildrenTransitions>
+        
     	<VisualStateManager.VisualStateGroups>
     		<VisualStateGroup x:Name="LayoutGroup">
     			<VisualState x:Name="DefaultLayout"/>
@@ -136,7 +142,15 @@
                     <ItemsControl ItemsSource="{Binding ActiveList}" ItemTemplate="{StaticResource taskTemplate}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <VariableSizedWrapGrid MaximumRowsOrColumns="5" Orientation="Vertical"/>
+                                <VariableSizedWrapGrid MaximumRowsOrColumns="5" Orientation="Vertical">
+                                    <VariableSizedWrapGrid.ChildrenTransitions>
+                                        <TransitionCollection>
+                                            <AddDeleteThemeTransition/>
+                                            <ReorderThemeTransition/>
+                                            <EntranceThemeTransition/>
+                                        </TransitionCollection>
+                                    </VariableSizedWrapGrid.ChildrenTransitions>
+                                </VariableSizedWrapGrid>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
@@ -148,7 +162,15 @@
                     <ItemsControl ItemsSource="{Binding FinishedList}" ItemTemplate="{StaticResource taskTemplate}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <VariableSizedWrapGrid MaximumRowsOrColumns="5" Orientation="Vertical"/>
+                                <VariableSizedWrapGrid MaximumRowsOrColumns="5" Orientation="Vertical">
+                                    <VariableSizedWrapGrid.ChildrenTransitions>
+                                        <TransitionCollection>
+                                            <AddDeleteThemeTransition/>
+                                            <ReorderThemeTransition/>
+                                            <EntranceThemeTransition/>
+                                        </TransitionCollection>
+                                    </VariableSizedWrapGrid.ChildrenTransitions>
+                                </VariableSizedWrapGrid>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
