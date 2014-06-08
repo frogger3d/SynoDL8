@@ -127,7 +127,6 @@
                     <StackPanel>
                         <TextBlock Text="{Binding Path=DownloadSpeed}" Foreground="LightGreen" Style="{StaticResource SubheaderTextBlockStyle}"/>
                         <TextBlock Text="{Binding Path=UploadSpeed}" Foreground="LightGoldenrodYellow" Style="{StaticResource SubheaderTextBlockStyle}" Margin="0,0,0,20"/>
-                        <TextBlock Text="{Binding Message}" Style="{StaticResource BaseTextBlockStyle}"/>
                     </StackPanel>
                 </DataTemplate>
             </HubSection>
@@ -156,5 +155,8 @@
                 </DataTemplate>
             </HubSection>
         </Hub>
+        <Border HorizontalAlignment="Center" VerticalAlignment="Top" BorderBrush="DarkOrange" CornerRadius="3" Background="DarkOrange">
+        	<TextBlock x:Name="messageBox" Text="{Binding Message}" Style="{StaticResource BaseTextBlockStyle}" Margin="5"/>
+        </Border>
     </Grid>
 </prism:VisualStateAwarePage>

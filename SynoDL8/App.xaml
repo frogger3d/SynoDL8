@@ -21,7 +21,7 @@
             </DataTemplate>
             
             <DataTemplate x:Key="taskTemplate">
-                <view:DownloadTaskView Width="500" />
+                <view:DownloadTaskView Width="320" Height="160"/>
             </DataTemplate>
             
             <Style x:Key="FlyoutStyle" TargetType="FlyoutPresenter">
