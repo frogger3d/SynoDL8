@@ -24,6 +24,8 @@
     public class MainPageViewModel : ReactiveObject, INavigationAware, IDisposable
     {
         private readonly ISynologyService SynologyService;
+        private readonly INavigationService NavigationService;
+
         private readonly ObservableAsPropertyHelper<string> uploadSpeed;
         private readonly ObservableAsPropertyHelper<string> downloadSpeed;
         private readonly Credentials Credentials;
@@ -39,8 +41,9 @@
 
         private ReactiveList<DownloadTaskViewViewModel> allTasks;
 
-        public MainPageViewModel(ISynologyService synologyService, IConfigurationService configurationService)
+        public MainPageViewModel(INavigationService navigationService, ISynologyService synologyService, IConfigurationService configurationService)
         {
+            this.NavigationService = navigationService.ThrowIfNull("navigationService");
             this.SynologyService = synologyService.ThrowIfNull("synologyService");
             this.Credentials = configurationService.ThrowIfNull("configurationService").GetLastCredentials();
             this.HostInfo = string.Format("{0} @ {1}", this.Credentials.User, this.Credentials.Hostname);
@@ -105,21 +108,27 @@
         {
             using (list.SuppressChangeNotifications())
             {
-                var removeIds = list.Select(t => t.Task.Id).Except(newTasks.Select(t => t.Id));
+                var removeIds = list.Select(t => t.Task.Id)
+                    .Except(newTasks.Select(t => t.Id))
+                    .ToList();
                 foreach (var id in removeIds)
                 {
                     var task = list.Single(t => t.Task.Id == id);
                     list.Remove(task);
                 }
 
-                var updateIds = list.Select(t => t.Task.Id).Intersect(newTasks.Select(t => t.Id));
+                var updateIds = list.Select(t => t.Task.Id)
+                    .Intersect(newTasks.Select(t => t.Id))
+                    .ToList();
                 foreach (var id in updateIds)
                 {
                     var task = list.Single(t => t.Task.Id == id);
                     task.Task = newTasks.Single(t => t.Id == id);
                 }
 
-                var addIds = newTasks.Select(t => t.Id).Except(list.Select(t => t.Task.Id));
+                var addIds = newTasks.Select(t => t.Id)
+                    .Except(list.Select(t => t.Task.Id))
+                    .ToList();
                 foreach (var id in addIds)
                 {
                     var task = newTasks.Single(t => t.Id == id);
@@ -228,16 +237,32 @@
             this.Dispose();
         }
 
-        public void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)
+        public async void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)
         {
-            string message = navigationParameter as string;
-            if (message != null)
-            {
-                this.Message = message;
-            }
-
             this.statisticsSubscription = this.statisticsObservable.Connect();
             this.listSubscription = this.listObservable.Connect();
+            if( !this.SynologyService.IsSignedIn)
+            {
+                if (!await this.SynologyService.LoginAsync(this.Credentials))
+                {
+                    this.NavigationService.GoBack();
+                    return;
+                }
+            }
+
+            var request = navigationParameter as DownloadRequest;
+            if (request != null)
+            {
+                var result = await this.SynologyService.CreateTaskAsync(request.Uri.ToString());
+                if (result.Success)
+                {
+                    string message = "download started";
+                    if (message != null)
+                    {
+                        this.Message = message;
+                    }
+                }
+            }
         }
     }
 }
