@@ -44,30 +44,30 @@ namespace SynoDL8.ViewModels
             this.DeleteCommand.RegisterAsyncTask(_ => this.SynologyService.DeleteTaskAsync(this.Task.Id)).Subscribe();
 
             this.isActive = this.WhenAny(v => v.Task.Status, a => a)
-                                     .Select(v =>
-                                     {
-                                         switch (this.Task.Status)
-                                         {
-                                             case DownloadTask.status.downloading:
-                                             case DownloadTask.status.extracting:
-                                             case DownloadTask.status.filehosting_waiting:
-                                             case DownloadTask.status.finishing:
-                                             case DownloadTask.status.waiting:
-                                             case DownloadTask.status.paused:
-                                             case DownloadTask.status.hash_checking:
-                                                 return true;
+                .Select(v =>
+                {
+                    switch (this.Task.Status)
+                    {
+                        case DownloadTask.status.downloading:
+                        case DownloadTask.status.extracting:
+                        case DownloadTask.status.filehosting_waiting:
+                        case DownloadTask.status.finishing:
+                        case DownloadTask.status.waiting:
+                        case DownloadTask.status.paused:
+                        case DownloadTask.status.hash_checking:
+                            return true;
 
-                                             case DownloadTask.status.error:
-                                             case DownloadTask.status.finished:
-                                             case DownloadTask.status.seeding:
-                                             case DownloadTask.status.unknown:
-                                                 return false;
+                        case DownloadTask.status.error:
+                        case DownloadTask.status.finished:
+                        case DownloadTask.status.seeding:
+                        case DownloadTask.status.unknown:
+                            return false;
 
-                                             default:
-                                                 throw new InvalidOperationException("Unknown status");
-                                         }
-                                     })
-                                     .ToProperty(this, v => v.IsActive);
+                        default:
+                            throw new InvalidOperationException("Unknown status");
+                    }
+                })
+                .ToProperty(this, v => v.IsActive);
 
             this.visualState = this.WhenAny(v => v.Task.Status, a => a)
                                      .Select(v =>
@@ -120,6 +120,11 @@ namespace SynoDL8.ViewModels
             get { return (double)this.Task.SizeDownloaded / this.Task.Size; }
         }
 
+        public bool IsActive
+        {
+            get { return this.isActive.Value; }
+        }
+
         public ReactiveCommand PlayCommand { get; set; }
         public ReactiveCommand PauseCommand { get; set; }
         public ReactiveCommand DeleteCommand { get; set; }
@@ -160,11 +165,6 @@ namespace SynoDL8.ViewModels
                                   this.Busy = false;
                                   new MessageDialog("Could not resume due to error");
                               });
-        }
-
-        public bool IsActive
-        {
-            get { return this.isActive.Value; }
         }
     }
 }

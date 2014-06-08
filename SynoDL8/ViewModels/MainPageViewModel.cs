@@ -21,7 +21,7 @@
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Navigation;
 
-    public class MainPageViewModel : ReactiveObject, INavigationAware, IDisposable
+    public class MainPageViewModel : ReactiveObject, INavigationAware, IDisposable, IEnableLogger
     {
         private readonly ISynologyService SynologyService;
         private readonly INavigationService NavigationService;
@@ -49,6 +49,7 @@
             this.HostInfo = string.Format("{0} @ {1}", this.Credentials.User, this.Credentials.Hostname);
 
             this.allTasks = new ReactiveList<DownloadTaskViewViewModel>();
+            this.allTasks.ChangeTrackingEnabled = true;
 
             var available = new BehaviorSubject<bool>(true);
 
@@ -74,19 +75,19 @@
 
             this.listObservable
                 .ObserveOnDispatcher()
-                .Subscribe(newTasks => UpdateList(newTasks, this.allTasks));
+                .Subscribe(newTasks => UpdateList(newTasks.ToList(), this.allTasks));
 
             this.ActiveList = this.allTasks
                 .CreateDerivedCollection(t => t, filter: t => t.IsActive, orderer: (t1, t2) => (int)(100 * t2.Progress - 100 * t1.Progress));
-            this.hasActive = this.ActiveList
-                .CountChanged
+            this.hasActive = this.ActiveList.Changed
+                .Select(_ => this.ActiveList.Count())
                 .Select(c => c > 0)
                 .ToProperty(this, v => v.HasActive);
 
             this.FinishedList = this.allTasks
                 .CreateDerivedCollection(t => t, filter: t => !t.IsActive);
-            this.hasFinished = this.ActiveList
-                .CountChanged
+            this.hasFinished = this.FinishedList.Changed
+                .Select(_ => this.FinishedList.Count())
                 .Select(c => c > 0)
                 .ToProperty(this, v => v.HasFinished);
 
@@ -102,39 +103,55 @@
             this.downloadSpeed = statisticsObservable
                 .Select(s => (s == null) ? "" : string.Format("Download: {0:0} KBps", s.DownloadSpeed / 1000.0))
                 .ToProperty(this, v => v.DownloadSpeed);
+
+            this.allTasks.CollectionChanged += (s, e) =>
+            {
+                Debug.WriteLine("all: " + e.Action);
+            };
+            this.ActiveList.CollectionChanged += (s, e) =>
+            {
+                Debug.WriteLine("active: " + e.Action);
+            };
+            this.FinishedList.CollectionChanged += (s, e) =>
+            {
+                Debug.WriteLine("finish: " + e.Action);
+            };
         }
 
-        private void UpdateList(IEnumerable<DownloadTask> newTasks, ReactiveList<DownloadTaskViewViewModel> list)
+        private void UpdateList(IList<DownloadTask> newTasks, ReactiveList<DownloadTaskViewViewModel> list)
         {
-            using (list.SuppressChangeNotifications())
+            var removeIds = list.Select(t => t.Task.Id)
+                .Except(newTasks.Select(t => t.Id))
+                .ToList();
+
+            var updateIds = list.Select(t => t.Task.Id)
+                .Intersect(newTasks.Select(t => t.Id))
+                .ToList();
+
+            var addIds = newTasks.Select(t => t.Id)
+                .Except(list.Select(t => t.Task.Id))
+                .ToList();
+
+            foreach (var id in removeIds)
             {
-                var removeIds = list.Select(t => t.Task.Id)
-                    .Except(newTasks.Select(t => t.Id))
-                    .ToList();
-                foreach (var id in removeIds)
-                {
-                    var task = list.Single(t => t.Task.Id == id);
-                    list.Remove(task);
-                }
-
-                var updateIds = list.Select(t => t.Task.Id)
-                    .Intersect(newTasks.Select(t => t.Id))
-                    .ToList();
-                foreach (var id in updateIds)
-                {
-                    var task = list.Single(t => t.Task.Id == id);
-                    task.Task = newTasks.Single(t => t.Id == id);
-                }
-
-                var addIds = newTasks.Select(t => t.Id)
-                    .Except(list.Select(t => t.Task.Id))
-                    .ToList();
-                foreach (var id in addIds)
-                {
-                    var task = newTasks.Single(t => t.Id == id);
-                    list.Add(new DownloadTaskViewViewModel(this.SynologyService, task));
-                }
+                var task = list.Single(t => t.Task.Id == id);
+                list.Remove(task);
             }
+            Debug.WriteLine("removed " + removeIds.Count);
+
+            foreach (var id in addIds)
+            {
+                var task = newTasks.Single(t => t.Id == id);
+                list.Add(new DownloadTaskViewViewModel(this.SynologyService, task));
+            }
+            Debug.WriteLine("added " + addIds.Count);
+
+            foreach (var id in updateIds)
+            {
+                var task = list.Single(t => t.Task.Id == id);
+                task.Task = newTasks.Single(t => t.Id == id);
+            }
+            Debug.WriteLine("updated " + updateIds.Count);
         }
 
         public string HostInfo { get; private set; }
