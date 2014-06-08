@@ -1,4 +1,5 @@
-﻿using SynoDL8.Model;
+﻿using Newtonsoft.Json.Linq;
+using SynoDL8.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,33 +11,57 @@ namespace SynoDL8.Services
 {
     public class ConfigurationService : IConfigurationService
     {
-        public const string HostnameKey = "hostname";
-        public const string UserKey = "user";
-        public const string PasswordKey = "password";
+        public const string AllKey = "all";
+        public const string LastKey = "last";
 
         private readonly ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
 
-        public event EventHandler Changed;
-
         public Credentials GetLastCredentials()
         {
-            return new Credentials()
+            var credentialsJason = localSettings.Values[LastKey] as string;
+            if(credentialsJason == null)
             {
-                Hostname = localSettings.Values[HostnameKey] as string,
-                User = localSettings.Values[UserKey] as string,
-                Password = localSettings.Values[PasswordKey] as string,
-            };
+                return null;
+            }
+            return Credentials.FromJason(credentialsJason);
         }
+
         public void SaveCredentials(Credentials credentials)
         {
-            localSettings.Values[HostnameKey] = credentials.Hostname;
-            localSettings.Values[UserKey] = credentials.User;
-            localSettings.Values[PasswordKey] = credentials.Password;
-            
-            var handle = this.Changed;
-            if(handle != null)
+            var allCredentials = this.GetAllCredentials();
+            allCredentials.Add(credentials);
+
+            localSettings.Values[LastKey] = credentials.ToJason();
+            localSettings.Values[AllKey] = Credentials.ToJason(allCredentials);
+        }
+
+
+        public HashSet<Credentials> GetAllCredentials()
+        {
+            var allCredentialsJason = localSettings.Values[AllKey] as string;
+            HashSet<Credentials> allCredentials = null;
+            if (allCredentialsJason != null)
             {
-                handle(this, EventArgs.Empty);
+                allCredentials = Credentials.EnumerableFromJason(allCredentialsJason);
+            }
+
+            return allCredentials ?? new HashSet<Credentials>();
+        }
+
+        public void RemoveCredentials(Credentials credentials)
+        {
+            var allCredentials = localSettings.Values[AllKey] as HashSet<Credentials>;
+            if (allCredentials == null)
+            {
+                allCredentials = new HashSet<Credentials>();
+            }
+
+            allCredentials.Remove(credentials);
+
+            localSettings.Values[AllKey] = Credentials.ToJason(allCredentials);
+            if (GetLastCredentials().Equals(credentials))
+            {
+                localSettings.Values[LastKey] = null;
             }
         }
     }

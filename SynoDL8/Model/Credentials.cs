@@ -1,4 +1,6 @@
 ﻿using Microsoft.Practices.Prism.StoreApps;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SynoDL8.Model
 {
-    public class Credentials : ValidatableBindableBase
+    public class Credentials : ValidatableBindableBase, IEquatable<Credentials>
     {
         private string hostname;
         private string user;
@@ -97,6 +99,54 @@ namespace SynoDL8.Model
             {
                 return new ValidationResult("Error in hostname");
             }
+        }
+
+        public bool Equals(Credentials other)
+        {
+            return other != null &&
+                string.Equals(other.Hostname, this.Hostname, StringComparison.Ordinal) &&
+                string.Equals(other.User, this.User, StringComparison.Ordinal) &&
+                string.Equals(other.Password, this.Password, StringComparison.Ordinal);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as Credentials);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.hostname.GetHashCode() ^ this.user.GetHashCode() ^ this.password.GetHashCode();
+        }
+
+        public static HashSet<Credentials> EnumerableFromJason(string allCredentialsJason)
+        {
+            return JsonConvert.DeserializeObject<HashSet<Credentials>>(allCredentialsJason);
+        }
+
+        public static Credentials FromJason(string credentialsJason)
+        {
+            return JsonConvert.DeserializeObject<Credentials>(credentialsJason);
+        }
+
+        public string ToJason()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+
+        public static string ToJason(HashSet<Credentials> credentials)
+        {
+            return JsonConvert.SerializeObject(credentials);
+        }
+
+        public Credentials Clone()
+        {
+            return new Credentials()
+            {
+                hostname = this.hostname,
+                user = this.user,
+                password = this.password,
+            };
         }
     }
 }

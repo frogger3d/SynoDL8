@@ -29,13 +29,8 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
-// The Split App template is documented at http://go.microsoft.com/fwlink/?LinkId=234228
-
 namespace SynoDL8
 {
-    /// <summary>
-    /// Provides application-specific behavior to supplement the default Application class.
-    /// </summary>
     sealed partial class App : MvvmAppBase
     {
         private IContainer container;
@@ -73,69 +68,28 @@ namespace SynoDL8
             });
         }
 
-        protected override async void OnActivated(IActivatedEventArgs args)
+        /// <summary>
+        /// Invoked when the application is activated by some means other than normal launching.
+        /// </summary>
+        protected override void OnActivated(IActivatedEventArgs args)
         {
             switch (args.Kind)
             {
                 case ActivationKind.Protocol:
                     ProtocolActivatedEventArgs protocolArgs = (ProtocolActivatedEventArgs)args;
-                    var synologyService = this.container.Resolve<ISynologyService>();
-                    var configurationService = this.container.Resolve<IConfigurationService>();
-                    var credentials = configurationService.GetLastCredentials();
-                    if (credentials != null)
-                    {
-                        await synologyService.LoginAsync(credentials);
-                        if (synologyService.IsSignedIn)
-                        {
-                            await synologyService.CreateTaskAsync(protocolArgs.Uri.ToString());
-                            if (args.PreviousExecutionState == ApplicationExecutionState.NotRunning)
-                            {
-                                NavigationService.Navigate("Main", "Download started");
-                            }
-
-                            return;
-                        }
-                    }
-
-                    if (args.PreviousExecutionState == ApplicationExecutionState.NotRunning)
-                    {
-                        NavigationService.Navigate("Login", null);
-                    }
-
-                    return;
+                    NavigationService.Navigate("Main", new DownloadRequest(protocolArgs.Uri));
+                    break;
             }
 
         }
 
-        protected override async Task OnLaunchApplication(LaunchActivatedEventArgs args)
+        /// <summary>
+        /// Invoked when the application is launched. Override this method to perform application initialization and to display initial content in the associated Window.
+        /// </summary>
+        protected override Task OnLaunchApplication(LaunchActivatedEventArgs args)
         {
-            switch (args.Kind)
-            {
-                case ActivationKind.Protocol:
-                    var synologyService = this.container.Resolve<ISynologyService>();
-                    var configurationService = this.container.Resolve<IConfigurationService>();
-                    var credentials = configurationService.GetLastCredentials();
-                    if (credentials != null)
-                    {
-                        await synologyService.LoginAsync(credentials);
-                        if (synologyService.IsSignedIn)
-                        {
-                            await synologyService.CreateTaskAsync(args.Arguments);
-                            NavigationService.Navigate("Main", null);
-                            return;
-                        }
-                    }
-
-                    NavigationService.Navigate("Login", null);
-                    return;
-
-                case ActivationKind.Launch:
-                    NavigationService.Navigate("Login", null);
-                    return;
-
-                default:
-                    throw new ArgumentException("Unexpected activation kind");
-            }
+            NavigationService.Navigate("Login", null);
+            return Task.FromResult<object>(null);
         }
     }
 }

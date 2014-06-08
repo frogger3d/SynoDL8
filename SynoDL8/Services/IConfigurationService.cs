@@ -11,7 +11,8 @@ namespace SynoDL8.Services
     public interface IConfigurationService
     {
         Credentials GetLastCredentials();
+        HashSet<Credentials> GetAllCredentials();
+        void RemoveCredentials(Credentials credentials);
         void SaveCredentials(Credentials credentials);
-        event EventHandler Changed;
     }
 }

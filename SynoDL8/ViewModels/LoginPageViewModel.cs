@@ -37,6 +37,7 @@ namespace SynoDL8.ViewModels
         private Credentials credentials;
         private bool busy;
         private string signinError;
+        private ReactiveList<PreviousCredentialsViewModel> previous;
 
         public LoginPageViewModel(IConfigurationService configurationService, ISynologyService synologyService, INavigationService navigationService)
         {
@@ -44,8 +45,29 @@ namespace SynoDL8.ViewModels
             this.SynologyService = synologyService.ThrowIfNull("synologyService");
             this.NavigationService = navigationService.ThrowIfNull("navigationService");
 
-            this.Credentials = this.ConfigurationService.GetLastCredentials();
+            this.Credentials = this.ConfigurationService.GetLastCredentials() ?? new Credentials();
             this.Credentials.IsValidationEnabled = true;
+
+            var previousCredentialsViewModels = this.ConfigurationService.GetAllCredentials()
+                .Select(c => new PreviousCredentialsViewModel(c))
+                .ToList(); // make sure we subscribe to the actual list, otherwise the subscriptions would get lost on requery
+            foreach(var vm in previousCredentialsViewModels)
+            {
+                var current = vm; // prevent all anonymous methods to reference the last instance
+                current.Remove.Subscribe(_ =>
+                {
+                    this.Previous.Remove(current);
+                    this.ConfigurationService.RemoveCredentials(current.Model);
+                });
+                current.Select.Subscribe(_ =>
+                {
+                    this.Credentials.Hostname = current.Model.Hostname;
+                    this.Credentials.User = current.Model.User;
+                    this.Credentials.Password = current.Model.Password;
+                });
+            }
+            this.Previous = new ReactiveList<PreviousCredentialsViewModel>();
+            this.Previous.AddRange(previousCredentialsViewModels);
 
             var hasErrorsObservable = Observable.FromEventPattern<DataErrorsChangedEventArgs>(h => this.Credentials.ErrorsChanged += h, h => this.Credentials.ErrorsChanged -= h)
                                                 .Select(e => this.Credentials.GetAllErrors().Any());
@@ -77,6 +99,12 @@ namespace SynoDL8.ViewModels
         {
             get { return this.credentials; }
             set { this.RaiseAndSetIfChanged(ref this.credentials, value); }
+        }
+
+        public ReactiveList<PreviousCredentialsViewModel> Previous
+        {
+            get { return this.previous; }
+            set { this.RaiseAndSetIfChanged(ref this.previous, value); }
         }
 
         public bool Busy

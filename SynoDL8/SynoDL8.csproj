@@ -116,8 +116,11 @@
     <Compile Include="Converters\FirstErrorConverter.cs" />
     <Compile Include="Converters\TextToHeaderVisibilityConverter.cs" />
     <Compile Include="DesignViewModels\DownloadTaskDesignViewModel.cs" />
+    <Compile Include="DesignViewModels\LoginPageDesignViewModel.cs" />
     <Compile Include="DesignViewModels\MainDesignViewModel.cs" />
+    <Compile Include="DesignViewModels\PreviousCredentialsDesignViewModel.cs" />
     <Compile Include="Model\Credentials.cs" />
+    <Compile Include="Model\DownloadRequest.cs" />
     <Compile Include="Services\IConfigurationService.cs" />
     <Compile Include="Services\ConfigurationService.cs" />
     <Compile Include="Model\DownloadTask.cs" />
@@ -128,6 +131,10 @@
     <Compile Include="Services\SynologyService.cs" />
     <Compile Include="Services\ISynologyService.cs" />
     <Compile Include="ViewModels\DownloadTaskViewViewModel.cs" />
+    <Compile Include="ViewModels\PreviousCredentialsViewModel.cs" />
+    <Compile Include="Views\PreviousCredentialsUserControl.xaml.cs">
+      <DependentUpon>PreviousCredentialsUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\LoginPage.xaml.cs">
       <DependentUpon>LoginPage.xaml</DependentUpon>
     </Compile>
@@ -159,6 +166,10 @@
     <Content Include="Assets\LightGray.png" />
     <Content Include="Assets\MediumGray.png" />
     <Content Include="Assets\DarkGray.png" />
+    <Page Include="Views\PreviousCredentialsUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\LoginPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -181,7 +192,7 @@
   <ItemGroup>
     <Reference Include="Autofac, Version=3.4.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Autofac.3.4.0\lib\portable-win+net40+sl50+wp8\Autofac.dll</HintPath>
+      <HintPath>..\packages\Autofac.3.4.1\lib\portable-win+net40+sl50+wp8\Autofac.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Practices.Prism.StoreApps">
       <HintPath>..\packages\Prism.StoreApps.1.1.0\lib\windows8\Microsoft.Practices.Prism.StoreApps.dll</HintPath>

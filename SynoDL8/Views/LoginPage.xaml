@@ -10,7 +10,9 @@
     xmlns:behavior="using:SynoDL8.Behaviors"
     xmlns:converter="using:SynoDL8.Converters"
     xmlns:prism="using:Microsoft.Practices.Prism.StoreApps"
+    xmlns:designviewmodels="using:SynoDL8.DesignViewModels"
     mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance designviewmodels:LoginPageDesignViewModel, IsDesignTimeCreatable=True}"
     prism:ViewModelLocator.AutoWireViewModel="True">
 
     <Grid x:Name="grid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -63,6 +65,28 @@
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
+                
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Margin="80,140,0,0" Text="PREVIOUS" Style="{StaticResource SubheaderTextBlockStyle}"/>
+                    
+                    <ItemsControl Grid.Row="1" Margin="80,20,80,80" ItemsSource="{Binding Path=Previous}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VariableSizedWrapGrid MaximumRowsOrColumns="5" Orientation="Vertical"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <local:PreviousCredentialsUserControl/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
             </StackPanel>
         </ScrollViewer>
         

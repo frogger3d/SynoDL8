@@ -62,11 +62,12 @@
             this.CreateCommand.RegisterAsyncTask(url => this.Create(url)).Subscribe();
 
             this.listObservable = Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(4))
-                                            .Select(t => Unit.Default)
-                                            .Merge(this.ListCommand.Select(l => Unit.Default))
-                                            .Select(t => this.SynologyService.List().ToObservable())
-                                            .Switch()
-                                            .Publish();
+                .Select(t => Unit.Default)
+                .Merge(this.ListCommand.Select(l => Unit.Default))
+                .Where(_ => this.SynologyService.IsSignedIn)
+                .Select(t => this.SynologyService.List().ToObservable())
+                .Switch()
+                .Publish();
 
             this.listObservable
                 .ObserveOnDispatcher()
@@ -87,6 +88,7 @@
                 .ToProperty(this, v => v.HasFinished);
 
             this.statisticsObservable = Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(4))
+                .Where(_ => this.SynologyService.IsSignedIn)
                 .Select(_ => Observable.FromAsync(this.SynologyService.GetStatisticsAsync))
                 .Switch()                                       
                 .Publish();
