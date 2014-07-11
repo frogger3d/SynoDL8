@@ -18,14 +18,14 @@ namespace SynoDL8.ViewModels
         {
             this.model = model;
 
-            this.Select = new ReactiveCommand();
-            this.Remove = new ReactiveCommand();
+            this.Select = ReactiveCommand.Create();
+            this.Remove = ReactiveCommand.Create();
         }
 
         public Credentials Model { get { return this.model; } }
 
-        public ReactiveCommand Select { get; private set; }
+        public ReactiveCommand<object> Select { get; private set; }
 
-        public ReactiveCommand Remove { get; private set; }
+        public ReactiveCommand<object> Remove { get; private set; }
     }
 }

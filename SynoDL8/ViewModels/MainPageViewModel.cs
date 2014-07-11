@@ -2,8 +2,7 @@
 {
     using Microsoft.Practices.Prism.StoreApps.Interfaces;
     using ReactiveUI;
-    using ReactiveUI.Xaml;
-    using ReactiveUI.Mobile;
+    using Splat;
     using SynoDL8.Model;
     using SynoDL8.Services;
     using System;
@@ -53,17 +52,19 @@
 
             var available = new BehaviorSubject<bool>(true);
 
-            this.VersionsCommand = new ReactiveCommand(available);
-            this.InfoCommand = new ReactiveCommand(available);
-            this.ListCommand = new ReactiveCommand(available);
-            this.CreateCommand = new ReactiveCommand(available);
+            this.VersionsCommand = ReactiveCommand.CreateAsyncTask(available, _ => this.Versions());
+            this.VersionsCommand.Subscribe(v => DisplayDialog(v));
+
+            this.InfoCommand = ReactiveCommand.CreateAsyncTask(available, _ => this.Info());
+            this.InfoCommand.Subscribe(v => DisplayDialog(v));
+
+            this.ListCommand = ReactiveCommand.Create(available);
+
+            this.CreateCommand = ReactiveCommand.CreateAsyncTask(available, url => this.Create(url));
+            this.CreateCommand.Subscribe();
 
             Observable.CombineLatest(VersionsCommand.IsExecuting, InfoCommand.IsExecuting, ListCommand.IsExecuting, CreateCommand.IsExecuting, (v, i, l, c) => !(v || i || l || c))
                       .Subscribe(n => available.OnNext(n));
-
-            this.VersionsCommand.RegisterAsyncTask(_ => this.Versions()).Subscribe(v => DisplayDialog(v));
-            this.InfoCommand.RegisterAsyncTask(_ => this.Info()).Subscribe(v => DisplayDialog(v));
-            this.CreateCommand.RegisterAsyncTask(url => this.Create(url)).Subscribe();
 
             this.listObservable = Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(4))
                 .Select(t => Unit.Default)
@@ -161,10 +162,10 @@
             await new MessageDialog(v).ShowAsync();
         }
 
-        public ReactiveCommand VersionsCommand { get; private set; }
-        public ReactiveCommand InfoCommand { get; private set; }
-        public ReactiveCommand ListCommand { get; private set; }
-        public ReactiveCommand CreateCommand { get; private set; }
+        public ReactiveCommand<string> VersionsCommand { get; private set; }
+        public ReactiveCommand<string> InfoCommand { get; private set; }
+        public ReactiveCommand<object> ListCommand { get; private set; }
+        public ReactiveCommand<bool> CreateCommand { get; private set; }
 
         public IReactiveDerivedList<DownloadTaskViewViewModel> ActiveList { get; private set; }
         public bool HasActive

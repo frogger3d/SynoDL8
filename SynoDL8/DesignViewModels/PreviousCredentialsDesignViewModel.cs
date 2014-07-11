@@ -20,8 +20,8 @@ namespace SynoDL8.DesignViewModels
 
         public Credentials Model { get { return this.model; } }
 
-        public ReactiveCommand Select { get; private set; }
+        public ReactiveCommand<object> Select { get; private set; }
 
-        public ReactiveCommand Remove { get; private set; }
+        public ReactiveCommand<object> Remove { get; private set; }
     }
 }

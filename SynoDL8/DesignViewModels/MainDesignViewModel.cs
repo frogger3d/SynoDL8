@@ -1,7 +1,6 @@
 ﻿namespace SynoDL8.DesignViewModels
 {
     using ReactiveUI;
-    using ReactiveUI.Xaml;
     using SynoDL8.Model;
     using SynoDL8.Services;
     using SynoDL8.ViewModels;

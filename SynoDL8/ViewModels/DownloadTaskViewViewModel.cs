@@ -1,5 +1,4 @@
 ﻿using ReactiveUI;
-using ReactiveUI.Xaml;
 using SynoDL8.Model;
 using SynoDL8.Services;
 using System;
@@ -32,16 +31,15 @@ namespace SynoDL8.ViewModels
 
             this.AreAllAvailable = new BehaviorSubject<bool>(true);
 
-            this.PauseCommand = new ReactiveCommand(AreAllAvailable);
-            this.PlayCommand = new ReactiveCommand(AreAllAvailable);
-            this.DeleteCommand = new ReactiveCommand(AreAllAvailable);
+            this.PauseCommand = ReactiveCommand.CreateAsyncTask(AreAllAvailable, _ => this.SynologyService.ResumeTaskAsync(this.Task.Id));
+            this.PauseCommand.Subscribe();
+            this.PlayCommand = ReactiveCommand.CreateAsyncTask(AreAllAvailable, _=> this.SynologyService.PauseTaskAsync(this.Task.Id));
+            this.PlayCommand.Subscribe();
+            this.DeleteCommand = ReactiveCommand.CreateAsyncTask(AreAllAvailable, _ => this.SynologyService.DeleteTaskAsync(this.Task.Id));
+            this.DeleteCommand.Subscribe();
 
             Observable.CombineLatest(PauseCommand.IsExecuting, PlayCommand.IsExecuting, (pa, pl) => !(pa || pl))
                       .Subscribe(n => AreAllAvailable.OnNext(n));
-
-            this.PlayCommand.RegisterAsyncTask(_ => this.SynologyService.ResumeTaskAsync(this.Task.Id)).Subscribe();
-            this.PauseCommand.RegisterAsyncTask(_ => this.SynologyService.PauseTaskAsync(this.Task.Id)).Subscribe();
-            this.DeleteCommand.RegisterAsyncTask(_ => this.SynologyService.DeleteTaskAsync(this.Task.Id)).Subscribe();
 
             this.isActive = this.WhenAny(v => v.Task.Status, a => a)
                 .Select(v =>
@@ -125,9 +123,9 @@ namespace SynoDL8.ViewModels
             get { return this.isActive.Value; }
         }
 
-        public ReactiveCommand PlayCommand { get; set; }
-        public ReactiveCommand PauseCommand { get; set; }
-        public ReactiveCommand DeleteCommand { get; set; }
+        public ReactiveCommand<bool> PlayCommand { get; set; }
+        public ReactiveCommand<bool> PauseCommand { get; set; }
+        public ReactiveCommand<bool> DeleteCommand { get; set; }
 
         private void Pause()
         {

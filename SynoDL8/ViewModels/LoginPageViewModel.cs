@@ -72,8 +72,8 @@ namespace SynoDL8.ViewModels
 
             var canSignin = new BehaviorSubject<bool>(true);
 
-            this.SigninCommand = new ReactiveCommand(canSignin);
-            this.SigninCommand.RegisterAsyncTask(_ => this.Signin())
+            this.SigninCommand = ReactiveCommand.CreateAsyncTask(canSignin, _ => this.Signin());
+            this.SigninCommand
                 .Subscribe(
                 n =>
                 {
@@ -131,7 +131,7 @@ namespace SynoDL8.ViewModels
             private set { this.RaiseAndSetIfChanged(ref this.signinError, value); }
         }
 
-        public ReactiveCommand SigninCommand { get; private set; }
+        public ReactiveCommand<bool> SigninCommand { get; private set; }
 
         private async Task<bool> Signin()
         {

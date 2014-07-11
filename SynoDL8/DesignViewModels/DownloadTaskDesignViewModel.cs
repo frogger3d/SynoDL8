@@ -1,5 +1,4 @@
 ﻿using ReactiveUI;
-using ReactiveUI.Xaml;
 using SynoDL8.Model;
 using SynoDL8.Services;
 using System;
